@@ -52,7 +52,12 @@ the docs or a related repository is answered, not asked.
 - Branch `<n>-<slug>` from the latest default branch (profile: *Branches*). If the main checkout has changes you did not
   make, work in a worktree (`git worktree add <profile's worktree location> -b <n>-<slug> origin/<default>`). Never commit,
   stash or reset someone else's changes.
-- Implement. Tests follow the profile's *Tests policy*; a bug fix gets the regression test that fails before the fix.
+- **Key first.** The first commit on the branch is the review key alone (`review-key`): `.review-keys/<n>.json` and its
+  oracle files, `Review key for #<n>`. Run it once and see it **fail**; comment the key's hashes on the issue. An issue
+  without a review key gets one now, written from its acceptance criteria and commented on the issue, before any code.
+- Implement until `keycheck.mjs run <n>` passes, running it every round. Never edit the key or its oracle; a wrong key
+  is a human decision (`decision`). Other tests follow the profile's *Tests policy*; a bug fix gets the regression test
+  that fails before the fix.
 - Commits per the profile's *Commits* format, each referencing `#<n>`. Stage explicit paths, never `git add -A`.
 - **Record as you go** in the issue: decisions and why, surprises, measurements. Not every keystroke — the things a
   reviewer would otherwise ask.
@@ -67,6 +72,9 @@ the docs or a related repository is answered, not asked.
 
 ## 7. Done or stopped
 
-- Done: hand off to `ship` (verify, PR with `Closes #<n>`, merge, deploy, verify live, close the loop).
+- Done means the key passes **for someone else**: spawn the `key-reviewer` agent with only the repository path, the
+  branch, the issue number and the base branch (`review-key`, *The loop*). `FAIL`: fix and ask again, at most three
+  rounds, then ask the human. `KEY-WEAK`: the key needs a human decision. `PASS`: hand off to `ship` (verify, PR with
+  `Closes #<n>` and the reviewer's verdict, demo, merge, deploy, verify live, close the loop).
 - Stopping before done: unclaim, and comment what is done, what is left and where the branch is. A claim nobody works on
   blocks everyone else.

@@ -53,6 +53,27 @@ Facts about THIS repository only; the skills hold the method. A missing section 
 | anything | `<command>` |
 | web | `<command>` |
 
+## Review keys
+
+- Issue heading: `## Review key` <or the profile language's heading>
+- Key files: `.review-keys/<n>.json`; key-owned corpora and check scripts under `<review-keys/<n>/ | e2e/review-keys/>`
+- Evidence: `out/review-key/<n>/` (git-ignored)
+- What the checks need running: <e.g. `docker compose up -d` (legacy on :8080), candidate `dotnet run` on :8081>
+- Usual kinds here: <parity against the legacy API | e2e checks that measure the UI | eval sets>
+
+## Demo
+
+<!-- Read by the showcase plugin's pr-demo skill. Leave out to skip demos. -->
+- When: <every PR | user-visible changes and ports>
+- Language of the captions: <English | Swedish>
+- Record the changed flow: <command that writes a .webm of the flow, e.g. `RECORD_VIDEO=out/demo/<n> node e2e/<check>.mjs`>
+- App for screenshots: <URL of the local stack>
+
+## Notify
+
+- Slack: <channel or DM id, e.g. the person's own DM `D0…`>; via <the Slack connector in the session | `SLACK_BOT_TOKEN`>
+- What: the PR link, three lines on what changed, the review key verdict, the demo video
+
 ## Merge
 
 - Who decides it ships: <the person you work for | any green PR>

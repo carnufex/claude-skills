@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>pr-demo player</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=block" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --bg: #0b0f17; --panel: #121a2a; --panel2: #18223a; --line: #263252; --ink: #e8edf6; --muted: #8e9ab3;
+    --accent: #7aa2ff; --ok: #3fd27a; --bad: #ff6b6b; --warn: #f2b84b; --changed: #ff9f43; --added: #3fd27a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1280px; height: 720px; overflow: hidden; background: var(--bg); color: var(--ink);
+    font-family: Inter, "Segoe UI", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  #stage { position: absolute; inset: 0; background:
+    radial-gradient(900px 500px at 85% -10%, rgba(122,162,255,.16), transparent 60%),
+    radial-gradient(700px 420px at -10% 110%, rgba(63,210,122,.10), transparent 60%), var(--bg); }
+  .grid { position: absolute; inset: 0; opacity: .35; background-image:
+    linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size: 40px 40px; mask-image: radial-gradient(ellipse at center, #000 40%, transparent 85%); }
+  header { position: absolute; left: 56px; right: 56px; top: 30px; display: flex; justify-content: space-between;
+    font-size: 15px; color: var(--muted); letter-spacing: .02em; }
+  header b { color: var(--ink); font-weight: 600; }
+  .bar { position: absolute; left: 0; bottom: 0; height: 4px; background: linear-gradient(90deg, var(--accent), var(--ok)); width: 0; }
+  .dots { position: absolute; right: 56px; bottom: 22px; display: flex; gap: 8px; }
+  .dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+  .dots i.on { background: var(--accent); }
+  .scene { position: absolute; inset: 0; padding: 92px 56px 56px; }
+  h2 { font-size: 40px; font-weight: 700; letter-spacing: -.02em; margin-bottom: 28px; }
+  h2 small { display: block; font-size: 16px; font-weight: 600; color: var(--accent); letter-spacing: .14em; text-transform: uppercase; margin-bottom: 10px; }
+  .title-wrap { position: absolute; left: 56px; right: 56px; top: 50%; transform: translateY(-50%); }
+  .kicker { font-size: 18px; font-weight: 600; color: var(--accent); letter-spacing: .16em; text-transform: uppercase; }
+  .title { font-size: 66px; font-weight: 800; letter-spacing: -.03em; line-height: 1.04; margin: 18px 0 22px; max-width: 1100px; }
+  .sweep { height: 6px; width: 220px; border-radius: 3px; background: linear-gradient(90deg, var(--accent), var(--ok)); transform-origin: left; }
+  .subtitle { font-size: 24px; color: var(--muted); margin-top: 24px; max-width: 1050px; line-height: 1.4; }
+  .chips { display: flex; gap: 10px; margin-top: 28px; }
+  .chip { padding: 8px 14px; border-radius: 999px; background: var(--panel2); border: 1px solid var(--line); font-size: 16px; font-weight: 600; }
+  .chip.ok { color: var(--ok); border-color: rgba(63,210,122,.4); }
+  ul.items { list-style: none; display: grid; gap: 18px; max-width: 1120px; }
+  ul.items li { display: flex; gap: 20px; align-items: flex-start; padding: 20px 24px; background: var(--panel);
+    border: 1px solid var(--line); border-radius: 16px; font-size: 25px; line-height: 1.35; }
+  ul.items li .n { flex: none; width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center;
+    background: rgba(122,162,255,.15); color: var(--accent); font-weight: 700; font-size: 19px; }
+  code, .mono { font-family: "JetBrains Mono", Consolas, monospace; font-size: .86em; background: rgba(255,255,255,.07);
+    padding: 1px 7px; border-radius: 6px; }
+  .flowbox { position: absolute; left: 56px; right: 56px; top: 178px; bottom: 56px; display: grid; place-items: center; }
+  .flowbox svg { max-width: 100%; max-height: 100%; }
+  .legend { position: absolute; left: 56px; bottom: 30px; display: flex; gap: 22px; font-size: 15px; color: var(--muted); }
+  .legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 8px; vertical-align: -1px; }
+  .legend .c::before { background: var(--changed); } .legend .a::before { background: var(--added); }
+  .compare { position: absolute; left: 56px; right: 56px; top: 178px; bottom: 56px; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .compare.stack { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; gap: 22px; }
+  .compare.stack .shot { padding-top: 34px; }
+  .shot { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; display: grid; place-items: center; }
+  .shot img { max-width: 100%; max-height: 100%; display: block; }
+  .shot .lab { position: absolute; left: 14px; top: 12px; padding: 5px 12px; border-radius: 8px; font-weight: 700; font-size: 15px;
+    background: rgba(11,15,23,.85); letter-spacing: .06em; text-transform: uppercase; }
+  .shot.before .lab { color: var(--bad); } .shot.after .lab { color: var(--ok); }
+  .shot.after { box-shadow: 0 0 0 2px rgba(63,210,122,.5), 0 20px 60px rgba(63,210,122,.12); }
+  .keygrid { display: grid; grid-template-columns: 1.25fr 1fr; gap: 32px; align-items: stretch; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 28px 30px; }
+  .badge { display: inline-block; padding: 6px 12px; border-radius: 8px; background: rgba(122,162,255,.15); color: var(--accent);
+    font-weight: 700; font-size: 15px; letter-spacing: .1em; text-transform: uppercase; }
+  .claim { font-size: 27px; line-height: 1.4; margin-top: 18px; }
+  .rows { margin-top: 22px; display: grid; gap: 10px; }
+  .row { display: flex; gap: 12px; align-items: baseline; font-size: 19px; color: var(--muted); }
+  .row b { color: var(--ink); font-weight: 600; }
+  .ic { flex: none; width: 24px; height: 24px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 15px; font-weight: 800; color: #08110c; background: var(--ok); }
+  .ic.no { background: var(--bad); color: #1a0606; }
+  .big { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; position: relative; }
+  .count { font-size: 120px; font-weight: 800; letter-spacing: -.04em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .count .of { color: var(--muted); font-weight: 600; font-size: .5em; }
+  .count-label { font-size: 22px; color: var(--muted); margin-top: 10px; }
+  .stamp { margin-top: 26px; padding: 12px 22px; border: 3px solid var(--ok); color: var(--ok); border-radius: 12px;
+    font-weight: 800; font-size: 30px; letter-spacing: .12em; }
+  .stamp.fail { border-color: var(--bad); color: var(--bad); }
+  .stamp-note { margin-top: 10px; font-size: 16px; color: var(--muted); }
+  .checks { display: grid; gap: 12px; max-width: 1120px; }
+  .check { display: grid; grid-template-columns: 34px 1fr auto; gap: 16px; align-items: center; padding: 16px 22px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px; font-size: 23px; }
+  .check .ic { width: 30px; height: 30px; font-size: 18px; }
+  .check .d { color: var(--muted); font-size: 18px; font-family: "JetBrains Mono", Consolas, monospace; }
+  .end { position: absolute; left: 56px; right: 56px; top: 50%; transform: translateY(-50%); text-align: center; }
+  .end .big-line { font-size: 46px; font-weight: 800; letter-spacing: -.02em; }
+  .end .lines { margin-top: 26px; display: grid; gap: 12px; font-size: 22px; color: var(--muted); }
+  .end .lines b { color: var(--ink); }
+  .clipbox { position: absolute; left: 56px; right: 56px; top: 178px; bottom: 76px; border-radius: 16px; background: #000;
+    border: 1px solid var(--line); }
+  .caption { position: absolute; left: 56px; right: 56px; bottom: 26px; font-size: 19px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div id="stage"><div class="grid"></div><header><span id="brand"></span><span id="ref"></span></header>
+  <div id="scene-host"></div><div class="dots" id="dots"></div><div class="bar" id="bar"></div></div>
+<script>
+const L = {
+  en: { before: 'Before', after: 'After', pass: 'PASS', fail: 'FAIL', weak: 'KEY-WEAK', reviewed: 'checked independently by key-reviewer',
+        identical: 'identical', checksPassed: 'checks pass', changed: 'changed', added: 'new', key: 'Review key', tests: 'Tests', what: 'What changed',
+        flow: 'How it works now', compare: 'Before and after', frozen: 'Key frozen before the code', base: 'Fails on the base branch, as it should' },
+  sv: { before: 'Före', after: 'Efter', pass: 'GODKÄND', fail: 'UNDERKÄND', weak: 'SVAG NYCKEL', reviewed: 'oberoende granskad av key-reviewer',
+        identical: 'identiska', checksPassed: 'kontroller gröna', changed: 'ändrat', added: 'nytt', key: 'Review key', tests: 'Tester', what: 'Vad ändrades',
+        flow: 'Så fungerar det nu', compare: 'Före och efter', frozen: 'Nyckeln låstes före koden', base: 'Faller på main, som den ska' },
+};
+const D = window.DEMO; const T = { ...L[D.lang === 'sv' ? 'sv' : 'en'], ...(D.strings || {}) };
+const host = document.getElementById('scene-host');
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const md = (s) => esc(s).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+document.getElementById('brand').innerHTML = md(D.brand || '');
+document.getElementById('ref').innerHTML = md(D.ref || '');
+const dots = document.getElementById('dots');
+D.scenes.forEach(() => dots.appendChild(document.createElement('i')));
+
+let current = null; // { el, duration, counters, fadeOut }
+const anim = (el, frames, delay, dur, easing = 'cubic-bezier(.2,.8,.2,1)') => el && el.animate(frames, { delay, duration: dur, easing, fill: 'both' });
+const rise = (el, delay, dist = 26) => anim(el, [{ opacity: 0, transform: `translateY(${dist}px)`, filter: 'blur(6px)' }, { opacity: 1, transform: 'none', filter: 'blur(0)' }], delay, 650);
+const pop = (el, delay) => anim(el, [{ opacity: 0, transform: 'scale(.6)' }, { opacity: 1, transform: 'scale(1.08)', offset: .7 }, { opacity: 1, transform: 'scale(1)' }], delay, 520);
+const slideIn = (el, delay) => anim(el, [{ opacity: 0, transform: 'translateX(-40px)' }, { opacity: 1, transform: 'none' }], delay, 560);
+
+const builders = {
+  title(s) {
+    const el = div(`<div class="title-wrap"><div class="kicker">${md(s.kicker || D.kicker || '')}</div><div class="title">${md(s.title || D.title)}</div>
+      <div class="sweep"></div><div class="subtitle">${md(s.subtitle || D.subtitle || '')}</div>
+      <div class="chips">${(s.chips || D.chips || []).map((c) => `<span class="chip ${c.ok ? 'ok' : ''}">${md(c.text || c)}</span>`).join('')}</div></div>`);
+    rise(q(el, '.kicker'), 150); rise(q(el, '.title'), 300, 40);
+    anim(q(el, '.sweep'), [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], 750, 700);
+    rise(q(el, '.subtitle'), 950); qa(el, '.chip').forEach((c, i) => pop(c, 1250 + i * 140));
+    return { el };
+  },
+  bullets(s) {
+    const el = div(`${h2(s.heading || T.what, s.kicker)}<ul class="items">${s.items.map((t, i) => `<li><span class="n">${i + 1}</span><span>${md(t)}</span></li>`).join('')}</ul>`);
+    rise(q(el, 'h2'), 100); qa(el, 'li').forEach((li, i) => slideIn(li, 500 + i * 650));
+    return { el };
+  },
+  async flow(s) {
+    const el = div(`${h2(s.heading || T.flow, s.kicker)}<div class="flowbox"></div>${s.legend === false ? '' : `<div class="legend"><span class="c">${T.changed}</span><span class="a">${T.added}</span></div>`}`);
+    rise(q(el, 'h2'), 100);
+    const src = `${s.mermaid.trim()}\nclassDef changed fill:#3a2612,stroke:#ff9f43,stroke-width:3px,color:#ffe2c4\nclassDef added fill:#10301f,stroke:#3fd27a,stroke-width:3px,color:#d4ffe6\nclassDef removed fill:#2a1416,stroke:#ff6b6b,stroke-width:2px,color:#ffc9c9,stroke-dasharray:6 4`;
+    const { svg } = await mermaid.render('m' + Math.random().toString(36).slice(2), src);
+    const box = q(el, '.flowbox'); box.innerHTML = svg;
+    const sv = box.querySelector('svg'); sv.removeAttribute('height'); sv.style.maxWidth = '100%'; sv.style.width = '100%'; sv.style.height = '100%';
+    const lr = /^\s*(flowchart|graph)\s+(LR|RL)/.test(s.mermaid);
+    // Mermaid positions nodes and labels with a transform attribute, which a CSS transform would replace: animate an inner group.
+    const inner = (g) => { const w = document.createElementNS('http://www.w3.org/2000/svg', 'g'); while (g.firstChild) w.appendChild(g.firstChild); g.appendChild(w);
+      w.style.transformBox = 'fill-box'; w.style.transformOrigin = 'center'; return w; };
+    const popSvg = (g, d) => pop(g.__inner || (g.__inner = inner(g)), d);
+    const nodes = [...sv.querySelectorAll('g.node')].map((n) => ({ n, r: n.getBoundingClientRect() }));
+    nodes.sort((a, b) => (lr ? a.r.x - b.r.x || a.r.y - b.r.y : a.r.y - b.r.y || a.r.x - b.r.x));
+    const step = Math.max(180, Math.min(420, 4200 / Math.max(1, nodes.length)));
+    const at = new Map();
+    nodes.forEach(({ n }, i) => { const d = 500 + i * step; at.set(n, d); popSvg(n, d);
+      if (n.classList.contains('changed') || n.classList.contains('added')) anim(n.__inner, [{ filter: 'drop-shadow(0 0 0 rgba(255,159,67,0))' }, { filter: 'drop-shadow(0 0 14px rgba(255,159,67,.75))' }, { filter: 'drop-shadow(0 0 0 rgba(255,159,67,0))' }], d + 500, 1400, 'ease-in-out'); });
+    sv.querySelectorAll('g.cluster').forEach((c) => anim(c, [{ opacity: 0 }, { opacity: 1 }], 300, 600));
+    const near = (pt) => { let best = null, bd = 1e9; for (const { n, r } of nodes) { const dx = Math.max(r.left - pt.x, 0, pt.x - r.right), dy = Math.max(r.top - pt.y, 0, pt.y - r.bottom); const d2 = dx * dx + dy * dy; if (d2 < bd) { bd = d2; best = n; } } return best; };
+    const toScreen = (p, pt) => { const m = p.getScreenCTM(); const o = sv.createSVGPoint(); o.x = pt.x; o.y = pt.y; return o.matrixTransform(m); };
+    sv.querySelectorAll('path.flowchart-link, .edgePaths path, path[id^="L_"], path[id^="L-"]').forEach((p) => {
+      if (p.dataset.done) return; p.dataset.done = 1;
+      const len = p.getTotalLength(); if (!len) return;
+      const a = near(toScreen(p, p.getPointAtLength(0))), b = near(toScreen(p, p.getPointAtLength(len)));
+      const d = Math.max(at.get(a) ?? 500, at.get(b) ?? 500) + 120;
+      p.style.strokeDasharray = `${len} ${len}`;
+      anim(p, [{ strokeDashoffset: len, opacity: 0 }, { strokeDashoffset: len * .9, opacity: 1, offset: .1 }, { strokeDashoffset: 0, opacity: 1 }], d, 520, 'ease-out');
+    });
+    sv.querySelectorAll('g.edgeLabel').forEach((g) => { const r = g.getBoundingClientRect(); const n = near({ x: r.x + r.width / 2, y: r.y + r.height / 2 }); popSvg(g, (at.get(n) ?? 500) + 300); });
+    return { el };
+  },
+  compare(s) {
+    const el = div(`${h2(s.heading || T.compare, s.kicker)}<div class="compare ${s.layout === 'stack' ? 'stack' : ''}">
+      <div class="shot before"><img src="${s.before}"><span class="lab">${esc(s.beforeLabel || T.before)}</span></div>
+      <div class="shot after"><img src="${s.after}"><span class="lab">${esc(s.afterLabel || T.after)}</span></div></div>`);
+    rise(q(el, 'h2'), 100); rise(q(el, '.before'), 400);
+    anim(q(el, '.after'), [{ clipPath: 'inset(0 100% 0 0)', opacity: 1 }, { clipPath: 'inset(0 0 0 0)', opacity: 1 }], 1300, 1100, 'cubic-bezier(.6,0,.2,1)');
+    return { el };
+  },
+  key(s) {
+    const r = s.result || {}; const p = r.parity; const checks = r.checks || [];
+    const verdict = (s.verdict || r.verdict || 'PASS').toUpperCase();
+    const total = s.count?.total ?? (p ? p.cases : checks.length);
+    const good = s.count?.value ?? (p ? p.identical : checks.filter((c) => c.ok).length);
+    const rows = [...(s.rows || []), ...checks.map((c) => ({ ok: c.ok, text: `<b>${md(c.name)}</b>${c.detail ? ' · ' + md(c.detail) : ''}` }))];
+    if (r.freeze) rows.unshift({ ok: !r.freeze.changed.length, text: T.frozen + ` <span class="mono">${esc(r.freeze.keyCommit.slice(0, 8))}</span>` });
+    if (s.baseFails !== undefined) rows.push({ ok: s.baseFails, text: T.base });
+    const el = div(`${h2(s.heading || T.key, s.kicker)}<div class="keygrid">
+      <div class="panel"><span class="badge">${esc(s.kind || r.kind || 'spec')}</span><div class="claim">${md(s.claim || r.claim || '')}</div>
+        <div class="rows">${rows.slice(0, 6).map((x) => `<div class="row"><span class="ic ${x.ok === false ? 'no' : ''}">${x.ok === false ? '✕' : '✓'}</span><span>${x.text}</span></div>`).join('')}</div></div>
+      <div class="panel big"><div class="count"><span class="num" data-to="${good}">0</span><span class="of">/${total}</span></div>
+        <div class="count-label">${esc(s.count?.label ?? (p ? T.identical : T.checksPassed))}</div>
+        <div class="stamp ${verdict === 'PASS' ? '' : 'fail'}">${verdict === 'PASS' ? T.pass : verdict === 'FAIL' ? T.fail : T.weak}</div>
+        <div class="stamp-note">${esc(s.reviewedBy || T.reviewed)}</div></div></div>`);
+    rise(q(el, 'h2'), 100); rise(q(el, '.panel'), 350); rise(qa(el, '.panel')[1], 550);
+    qa(el, '.row').forEach((x, i) => slideIn(x, 900 + i * 260));
+    anim(q(el, '.stamp'), [{ opacity: 0, transform: 'scale(2.2) rotate(-8deg)' }, { opacity: 1, transform: 'scale(.94) rotate(-3deg)', offset: .75 }, { opacity: 1, transform: 'scale(1) rotate(-3deg)' }], 2900, 520);
+    rise(q(el, '.stamp-note'), 3300, 10);
+    return { el, counters: [{ el: q(el, '.num'), to: good, start: 900, dur: 1800 }] };
+  },
+  checks(s) {
+    const el = div(`${h2(s.heading || T.tests, s.kicker)}<div class="checks">${s.items.map((c) => `<div class="check"><span class="ic ${c.ok === false ? 'no' : ''}">${c.ok === false ? '✕' : '✓'}</span>
+      <span>${md(c.name)}</span><span class="d">${md(c.detail || '')}</span></div>`).join('')}</div>`);
+    rise(q(el, 'h2'), 100); qa(el, '.check').forEach((c, i) => { slideIn(c, 450 + i * 420); pop(q(c, '.ic'), 650 + i * 420); });
+    return { el };
+  },
+  clip(s) {
+    const el = div(`${h2(s.heading || '', s.kicker)}<div class="clipbox"></div><div class="caption">${md(s.caption || '')}</div>`);
+    rise(q(el, 'h2'), 0); // the background frame is taken after this has settled
+    const r = q(el, '.clipbox').getBoundingClientRect();
+    return { el, box: { x: Math.round(r.x) + 1, y: Math.round(r.y) + 1, w: Math.round(r.width) - 2, h: Math.round(r.height) - 2 } };
+  },
+  end(s) {
+    const el = div(`<div class="end"><div class="big-line">${md(s.title || '')}</div><div class="lines">${(s.lines || []).map((l) => `<div>${md(l)}</div>`).join('')}</div></div>`);
+    rise(q(el, '.big-line'), 150, 30); qa(el, '.lines div').forEach((d, i) => rise(d, 600 + i * 250, 14));
+    return { el };
+  },
+};
+function div(html) { const el = document.createElement('div'); el.className = 'scene'; el.innerHTML = html; host.appendChild(el); return el; }
+const q = (el, s) => el.querySelector(s); const qa = (el, s) => [...el.querySelectorAll(s)];
+const h2 = (t, k) => `<h2>${k ? `<small>${md(k)}</small>` : ''}${md(t)}</h2>`;
+
+window.show = async (i) => {
+  host.innerHTML = ''; document.getAnimations().forEach((a) => a.cancel());
+  const s = D.scenes[i]; const b = builders[s.type]; if (!b) throw new Error('unknown scene type ' + s.type);
+  current = await b(s); current.index = i;
+  current.duration = Math.round((s.seconds || 6) * 1000);
+  anim(current.el, [{ opacity: 0 }, { opacity: 1 }], 0, 350, 'ease-out');
+  [...dots.children].forEach((d, j) => d.classList.toggle('on', j === i));
+  const anims = document.getAnimations();
+  anims.forEach((a) => a.pause());
+  const settle = Math.max(0, ...anims.map((a) => a.effect.getComputedTiming().endTime)) + 50;
+  const counterEnd = Math.max(0, ...(current.counters || []).map((c) => c.start + c.dur));
+  current.settle = Math.max(settle, counterEnd);
+  return { duration: current.duration, settle: current.settle, box: current.box || null };
+};
+window.seek = (t) => {
+  document.getAnimations().forEach((a) => { a.currentTime = t; });
+  for (const c of current.counters || []) { const k = Math.min(1, Math.max(0, (t - c.start) / c.dur)); c.el.textContent = Math.round(c.to * (1 - Math.pow(1 - k, 3))); }
+  const fade = 350; const left = current.duration - t;
+  document.getElementById('scene-host').style.opacity = left < fade ? Math.max(0, left / fade) : 1;
+  const total = D.scenes.reduce((a, s) => a + (s.seconds || 6), 0) * 1000;
+  const before = D.scenes.slice(0, current.index).reduce((a, s) => a + (s.seconds || 6), 0) * 1000;
+  document.getElementById('bar').style.width = `${((before + t) / total) * 100}%`;
+};
+window.ready = (async () => {
+  mermaid.initialize({ startOnLoad: false, theme: 'base', securityLevel: 'loose', flowchart: { curve: 'basis', padding: 18, nodeSpacing: 46, rankSpacing: 64, htmlLabels: true },
+    themeVariables: { background: 'transparent', primaryColor: '#18223a', primaryBorderColor: '#3b4c78', primaryTextColor: '#e8edf6', lineColor: '#7aa2ff',
+      fontFamily: 'Inter, Segoe UI, sans-serif', fontSize: '19px', clusterBkg: 'rgba(122,162,255,.06)', clusterBorder: '#263252', edgeLabelBackground: '#0b0f17' } });
+  await document.fonts.ready; return true;
+})();
+</script>
+</body>
+</html>

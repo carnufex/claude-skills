@@ -19,12 +19,20 @@ On the branch rebased on the latest default branch (`git fetch origin && git reb
 4. Docs, ADRs and design documents the change affects are updated in the same branch.
 5. **3 am**: the change's failure would show up somewhere a person sees it (the signal named in the plan, existing or
    added). Write it in the PR as `3 am: <signal>`; pure refactors, copy and styling are exempt.
+6. **Review key**: the `key-reviewer` agent answered `PASS` on the branch as it is now (`review-key`). A commit after its
+   verdict means asking again.
 
 ## 2. Pull request
 
 `git push -u origin <branch>` and `gh pr create --title "<profile's PR title format>" --body-file <file>`. Body per the
-profile's template (else: what and why, `Closes #<n>`, **Verified** — what you ran and saw, `3 am:` line, screenshots).
-Stage explicit paths only; `git fetch` before every push — other sessions push to the same repository.
+profile's template (else: what and why, `Closes #<n>`, **Verified** — what you ran and saw, `3 am:` line, screenshots),
+plus a **Review key** section: the key's claim, the reviewer's verdict verbatim, and the change as a `mermaid` flowchart
+when it changes a flow (GitHub draws it). Stage explicit paths only; `git fetch` before every push — other sessions push
+to the same repository.
+
+Then show the change instead of the code, if the profile has a *Demo* section: the `pr-demo` skill (showcase plugin)
+renders a short video — what changed, the flow, the review key's result, the recorded browser run, the tests — and posts
+it with the PR link where the profile's *Notify* says.
 
 If the diff touches the paths the review profile marks as person-reviewed (`.claude/profiles/review.md`), run the
 `review-hotspots` skill (review plugin) and put its map at the top of the PR description, then stop and ask for the review.

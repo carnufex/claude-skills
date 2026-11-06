@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "carnufex",
-  "description": "Christopher's Claude Code skills, shared across his repositories: issue-to-production delivery, review sweeps and pull-request hotspot reviews, and GitOps app onboarding. Each skill keeps project facts in a profile file in the repository it runs in.",
+  "description": "Christopher's Claude Code skills, shared across his repositories: issue-to-production delivery with review keys, review sweeps and pull-request hotspot reviews, PR demo videos, and GitOps app onboarding. Each skill keeps project facts in a profile file in the repository it runs in.",
   "owner": {
     "name": "Christopher Rosenvall",
     "url": "https://github.com/carnufex"
@@ -9,8 +9,8 @@
   "plugins": [
     {
       "name": "delivery",
-      "description": "From issue to verified production: ready issues, race-safe claims, milestone planning, needs-human decisions recorded as ADRs, and shipping through GitOps with a live check and rollback by revert.",
-      "version": "1.0.0",
+      "description": "From issue to verified production: ready issues with a review key, race-safe claims, an implementer/reviewer loop that an independent key-reviewer agent must pass, milestone planning, needs-human decisions recorded as ADRs, and shipping through GitOps with a live check and rollback by revert.",
+      "version": "1.1.0",
       "source": "./plugins/delivery",
       "category": "development",
       "keywords": [
@@ -20,7 +20,10 @@
         "workflow",
         "deploy",
         "gitops",
-        "adr"
+        "adr",
+        "review-key",
+        "parity",
+        "verification"
       ]
     },
     {
@@ -49,6 +52,21 @@
         "gitops",
         "external-secrets",
         "gateway-api"
+      ]
+    },
+    {
+      "name": "showcase",
+      "description": "Show a pull request instead of its code: a short rendered video of what changed, the animated flow, before/after, the recorded run and the review key's verdict, posted with the PR link to Slack.",
+      "version": "1.0.0",
+      "source": "./plugins/showcase",
+      "category": "development",
+      "keywords": [
+        "demo",
+        "video",
+        "pull-request",
+        "slack",
+        "playwright",
+        "mermaid"
       ]
     }
   ]

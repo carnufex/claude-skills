@@ -26,11 +26,16 @@ Write only what you found; leave a section out rather than invent a rule. Tell t
    - **Background** — why this matters, what exists today (with `path:line` or links).
    - **Goal** — the outcome, from the outside.
    - **Acceptance criteria** — checkboxes, each one observable or testable. "Works well" is not a criterion.
+   - **Review key** — the one check, decided now, that says the work is done and that the implementer cannot move:
+     parity with the legacy output, a shadow-traffic diff, bit-exact output, a spec or e2e check that measures the
+     behaviour, or an eval threshold (`review-key` has the kinds and what makes one good). Name the corpus or the
+     checks and the normalisation. It must fail today. Heading per the profile's *Review keys*.
    - **Out of scope** — what this issue deliberately does not do.
    - **How we'd notice it failing** — for behaviour that runs in production: the alert, log line or metric that
      would show it broken at 3 am, existing or to be added. Omit for docs and pure tooling.
    - **References** — ADRs, docs, related issues ("Found in #<n>" for discovered work).
-4. **Ready or not.** Set the profile's ready status only if someone could start without a question. If it needs a human
+4. **Ready or not.** Set the profile's ready status only if someone could start without a question **and the issue has a
+   review key** (a `judgement` key says who judges and what they look at). If it needs a human
    decision first, follow `decision` instead (a `needs-human` section with the question, options and your recommendation).
    If you could find the answer yourself — in the repository, a related repository or the docs — find it.
 5. **Create** with a body file (never inline long bodies in the shell):

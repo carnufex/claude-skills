@@ -1,0 +1,12 @@
+{
+  "name": "showcase",
+  "description": "Show a pull request instead of its code: a short rendered video (what changed, the flow as an animated flowchart, before/after, the recorded browser run, the review key's verdict, the tests) posted with the PR link to Slack.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Christopher Rosenvall",
+    "url": "https://github.com/carnufex"
+  },
+  "repository": "https://github.com/carnufex/claude-skills",
+  "license": "MIT",
+  "keywords": ["demo", "video", "pull-request", "slack", "playwright", "mermaid"]
+}

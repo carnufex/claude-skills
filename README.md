@@ -9,6 +9,7 @@ One skill, many repositories, no copies drifting apart.
 /plugin marketplace add carnufex/claude-skills
 /plugin install delivery@carnufex
 /plugin install review@carnufex
+/plugin install showcase@carnufex
 ```
 
 A repository can pin the plugins it uses in its own `.claude/settings.json`, so every session there gets them:
@@ -18,7 +19,7 @@ A repository can pin the plugins it uses in its own `.claude/settings.json`, so 
   "extraKnownMarketplaces": {
     "carnufex": { "source": { "source": "github", "repo": "carnufex/claude-skills" } }
   },
-  "enabledPlugins": { "delivery@carnufex": true, "review@carnufex": true }
+  "enabledPlugins": { "delivery@carnufex": true, "review@carnufex": true, "showcase@carnufex": true }
 }
 ```
 
@@ -26,7 +27,8 @@ A repository can pin the plugins it uses in its own `.claude/settings.json`, so 
 
 | Plugin | Skills | Profile |
 |---|---|---|
-| **delivery** | `new-issue` · `work-issue` (claim with the bundled race-safe `claim.mjs`, plan, branch, build) · `plan-milestone` · `decision` (needs-human questions, ADRs) · `ship` (verify → PR → merge → GitOps deploy → live check → rollback) | `.claude/profiles/delivery.md` |
+| **delivery** | `new-issue` · `review-key` (the frozen check that says done: parity, shadow, bit-exact, spec, eval; `keycheck.mjs` runs it) · `work-issue` (claim with the bundled race-safe `claim.mjs`, key first, build until the key passes, then the `key-reviewer` agent) · `plan-milestone` · `decision` (needs-human questions, ADRs) · `ship` (verify → PR → merge → GitOps deploy → live check → rollback) | `.claude/profiles/delivery.md` |
+| **showcase** | `pr-demo` (a 30–60 s video of a PR — what changed, the animated flow, before/after, the recorded run, the review key's verdict — posted with the link to Slack) | `.claude/profiles/delivery.md` (*Demo*, *Notify*) |
 | **review** | `review-sweep` (whole codebase or one area → verified findings → one GitHub issue each) · `review-hotspots` (one PR → a "look here first" map of at most three entries, then at most five findings) | `.claude/profiles/review.md` |
 | **gitops** | `gitops-app-onboarding` (new app in an ArgoCD ApplicationSet cluster: whitelists, secrets, storage, routes, the 3 am alert) | `.claude/profiles/gitops.md` |
 
@@ -34,6 +36,13 @@ This repository is public: nothing here may name a host, an address, a secret or
 belong in the profile files of the repositories that use the skills.
 
 ## Principles the skills share
+
+- **Done is decided before the work.** Every ready issue carries a **review key**: the check that says it is done —
+  identical output to the legacy system, a shadow-traffic diff, bit-exact files, a spec suite, an eval threshold. It is
+  committed first and frozen; the implementer works until it passes, and a separate reviewer agent that never saw the
+  implementer's reasoning runs it again, proves it fails on the base, and looks for ways it was gamed.
+- **Show, then read.** A PR arrives with a short video and a flowchart of what changed and the key's verdict; the diff is
+  for the few places that need a person.
 
 - **Method in the skill, facts in the profile.** A skill never names a repository's paths; the profile never explains how to
   review or onboard. A missing profile section means "use the skill's defaults", never "guess".
