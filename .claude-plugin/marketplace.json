@@ -1,0 +1,27 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "carnufex",
+  "description": "Christopher's Claude Code skills, shared across his repositories: review sweeps and pull-request hotspot reviews, and GitOps app onboarding. Each skill keeps project facts in a profile file in the repository it runs in.",
+  "owner": {
+    "name": "Christopher Rosenvall",
+    "url": "https://github.com/carnufex"
+  },
+  "plugins": [
+    {
+      "name": "review",
+      "description": "Whole-codebase review sweeps that file one verified issue per finding, and pull-request reviews that point a person at the three places worth their ten minutes.",
+      "version": "1.0.0",
+      "source": "./plugins/review",
+      "category": "development",
+      "keywords": ["code-review", "security", "pull-request", "audit", "observability"]
+    },
+    {
+      "name": "gitops",
+      "description": "Onboard a new application into an ArgoCD ApplicationSet cluster, with every namespace whitelist, External Secrets, routes and the alert that tells on-call it is down.",
+      "version": "1.0.0",
+      "source": "./plugins/gitops",
+      "category": "devops",
+      "keywords": ["kubernetes", "argocd", "gitops", "external-secrets", "gateway-api"]
+    }
+  ]
+}

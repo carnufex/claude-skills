@@ -1,0 +1,11 @@
+{
+  "name": "review",
+  "description": "Whole-codebase review sweeps that file one verified issue per finding, and pull-request reviews that point a person at the three places worth their ten minutes. Project facts live in .claude/profiles/review.md.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Christopher Rosenvall",
+    "url": "https://github.com/carnufex"
+  },
+  "repository": "https://github.com/carnufex/claude-skills",
+  "keywords": ["code-review", "security", "pull-request", "audit", "observability"]
+}

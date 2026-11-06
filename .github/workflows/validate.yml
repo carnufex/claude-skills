@@ -1,0 +1,59 @@
+name: Validate
+
+# Every pull request and every push to main proves the marketplace is installable and every skill is
+# internally consistent. tools/validate.sh runs the same checks locally.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  skills:
+    name: Skills, references, manifests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the version-bump check compares against the base
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml==6.0.2
+      - name: Check skills and manifests
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "$EVENT" = "pull_request" ]; then
+            python3 tools/validate_skills.py --base "origin/$BASE_REF"
+          elif [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ]; then
+            python3 tools/validate_skills.py --base "$BEFORE"
+          else
+            python3 tools/validate_skills.py
+          fi
+
+  manifests:
+    name: claude plugin validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install --global @anthropic-ai/claude-code@2.1.238
+      - name: Validate the marketplace and each plugin, warnings as errors
+        run: |
+          claude plugin validate . --strict
+          for plugin in plugins/*/; do
+            claude plugin validate "$plugin" --strict
+          done

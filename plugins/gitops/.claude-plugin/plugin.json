@@ -1,0 +1,11 @@
+{
+  "name": "gitops",
+  "description": "Onboard a new application into an ArgoCD ApplicationSet cluster: namespace whitelists, External Secrets, images, storage, routes and the alert that tells on-call it is down. Cluster facts live in .claude/profiles/gitops.md.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Christopher Rosenvall",
+    "url": "https://github.com/carnufex"
+  },
+  "repository": "https://github.com/carnufex/claude-skills",
+  "keywords": ["kubernetes", "argocd", "gitops", "external-secrets", "gateway-api"]
+}
