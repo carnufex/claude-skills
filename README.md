@@ -10,6 +10,7 @@ One skill, many repositories, no copies drifting apart.
 /plugin install delivery@carnufex
 /plugin install review@carnufex
 /plugin install showcase@carnufex
+/plugin install slack-channel@carnufex
 ```
 
 A repository can pin the plugins it uses in its own `.claude/settings.json`, so every session there gets them:
@@ -29,6 +30,7 @@ A repository can pin the plugins it uses in its own `.claude/settings.json`, so 
 |---|---|---|
 | **delivery** | `new-issue` · `review-key` (the frozen check that says done: parity, shadow, bit-exact, spec, eval; `keycheck.mjs` runs it) · `work-issue` (claim with the bundled race-safe `claim.mjs`, key first, build until the key passes, then the `key-reviewer` agent) · `plan-milestone` · `decision` (needs-human questions, ADRs) · `ship` (verify → PR → merge → GitOps deploy → live check → rollback) | `.claude/profiles/delivery.md` |
 | **showcase** | `pr-demo` (a 30–60 s video of a PR — what changed, the animated flow, before/after, the recorded run, the review key's verdict — posted with the link to Slack) | `.claude/profiles/delivery.md` (*Demo*, *Notify*) |
+| **slack-channel** | `slack-channel-setup` — a Claude Code channel: chat in Slack (DM or channel) with the session on your own computer over Socket Mode; replies in threads, uploads, tool approvals as Allow/Deny buttons | `~/.claude/channels/slack/` (tokens, allowlist) |
 | **review** | `review-sweep` (whole codebase or one area → verified findings → one GitHub issue each) · `review-hotspots` (one PR → a "look here first" map of at most three entries, then at most five findings) | `.claude/profiles/review.md` |
 | **gitops** | `gitops-app-onboarding` (new app in an ArgoCD ApplicationSet cluster: whitelists, secrets, storage, routes, the 3 am alert) | `.claude/profiles/gitops.md` |
 

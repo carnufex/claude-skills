@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "type": "module",
+  "description": "End-to-end test of the slack-channel server against a mock Slack.",
+  "scripts": { "test": "node e2e.mjs" },
+  "devDependencies": { "ws": "8.18.3" }
+}

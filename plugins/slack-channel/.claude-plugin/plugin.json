@@ -1,0 +1,12 @@
+{
+  "name": "slack-channel",
+  "description": "Chat in Slack with the Claude Code session running on your own computer: a Claude Code channel over Slack Socket Mode (no inbound endpoint), with replies in threads, file uploads and tool approvals as Allow/Deny buttons. Zero dependencies, Node 22+.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Christopher Rosenvall",
+    "url": "https://github.com/carnufex"
+  },
+  "repository": "https://github.com/carnufex/claude-skills",
+  "license": "MIT",
+  "keywords": ["slack", "channel", "chat", "remote", "mcp", "socket-mode"]
+}

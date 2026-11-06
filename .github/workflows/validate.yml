@@ -57,3 +57,15 @@ jobs:
           for plugin in plugins/*/; do
             claude plugin validate "$plugin" --strict
           done
+
+  slack-channel:
+    name: slack-channel server against a mock Slack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: End-to-end test over stdio
+        working-directory: plugins/slack-channel/tests
+        run: npm ci --no-audit --no-fund && node e2e.mjs

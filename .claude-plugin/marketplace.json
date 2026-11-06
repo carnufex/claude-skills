@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "carnufex",
-  "description": "Christopher's Claude Code skills, shared across his repositories: issue-to-production delivery with review keys, review sweeps and pull-request hotspot reviews, PR demo videos, and GitOps app onboarding. Each skill keeps project facts in a profile file in the repository it runs in.",
+  "description": "Christopher's Claude Code skills, shared across his repositories: issue-to-production delivery with review keys, review sweeps and pull-request hotspot reviews, PR demo videos, a Slack channel to the local CLI, and GitOps app onboarding. Each skill keeps project facts in a profile file in the repository it runs in.",
   "owner": {
     "name": "Christopher Rosenvall",
     "url": "https://github.com/carnufex"
@@ -67,6 +67,21 @@
         "slack",
         "playwright",
         "mermaid"
+      ]
+    },
+    {
+      "name": "slack-channel",
+      "description": "Chat in Slack with the Claude Code session on your own computer: a Claude Code channel over Slack Socket Mode, replies in threads, file uploads, and tool approvals as Allow/Deny buttons.",
+      "version": "1.0.0",
+      "source": "./plugins/slack-channel",
+      "category": "productivity",
+      "keywords": [
+        "slack",
+        "channel",
+        "chat",
+        "remote",
+        "mcp",
+        "socket-mode"
       ]
     }
   ]
