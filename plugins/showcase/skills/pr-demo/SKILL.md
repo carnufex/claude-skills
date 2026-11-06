@@ -1,13 +1,23 @@
 ---
 name: pr-demo
-description: Show a pull request instead of its code — render a 30–60 second video (title, what changed, the change as an animated flowchart, before/after screenshots, the recorded browser run, the review key's verdict, the tests) and post it with the PR link to Slack. Use after opening a PR when the repository's delivery profile has a Demo section, when asked for a demo, a video, a recording or a visual summary of a change, or to notify someone that a PR is ready.
+description: Show a pull request instead of its code — render a 25–40 second video (what changed, how it works now, before and after, the fix running, and the review key and tests together in one scene) and post it with the PR link to Slack. Use after opening a PR when the repository's delivery profile has a Demo section, when asked for a demo, a video, a recording or a visual summary of a change, or to notify someone that a PR is ready.
 ---
 
 # PR demo
 
-A reviewer should understand a change in a minute without opening the diff: what changed, how it works now, proof that
-it works (the review key, tests, a recording), and where to look. Repository facts — caption language, how to record the
-changed flow, where to post — are in `.claude/profiles/delivery.md` (*Demo*, *Notify*).
+A reviewer should understand a change in well under a minute without opening the diff: what changed, how it works now,
+proof that it works, and where to look. Repository facts — caption language, how to record the changed flow, where to
+post — are in `.claude/profiles/delivery.md` (*Demo*, *Notify*).
+
+**Short and blunt beats complete.** Five scenes in 30 seconds, in this order, and leave out what the change does not
+have rather than padding it:
+
+1. **What changed** — the title and at most three bullets.
+2. **How it works now** — the flow, with the changed node marked.
+3. **Before and after** — only for something you can see; skip it for a backend change.
+4. **The fix running** — the recording, cropped to the part that matters, under 12 s.
+5. **Proof** — the review key's checks **and** the tests in one `key` scene. They answer the same question, so they
+   do not get a scene each.
 
 ## 1. Gather the material
 
@@ -40,14 +50,14 @@ seconds. Backticks and `**bold**` work.
   "subtitle": "The pay button covered the basket, and the coupon field was 49 px wide.",
   "chips": [{ "text": "Review key: PASS", "ok": true }, "3 files"],
   "scenes": [
-    { "type": "title", "seconds": 4 },
-    { "type": "bullets", "items": ["…", "…", "…"], "seconds": 6 },
-    { "type": "flow", "mermaid": "flowchart LR\n  A[Width] --> B{\"< 1440 px?\"}\n  B -- yes --> C[Icons]:::changed", "seconds": 7 },
-    { "type": "compare", "before": "before.png", "after": "after.png", "seconds": 6 },
-    { "type": "clip", "heading": "Recorded at 1280 px", "src": "run.webm", "caption": "e2e: checkout-fit", "speed": 1.5 },
-    { "type": "key", "result": "../../review-key/331/result.json", "baseFails": true, "seconds": 7 },
-    { "type": "checks", "items": [{ "name": "scripts/verify.sh", "detail": "476 tests" }], "seconds": 4 },
-    { "type": "end", "title": "Ready for review", "lines": ["PR: **github.com/…/pull/352**", "3 am: …"], "seconds": 4 }
+    { "type": "title", "seconds": 3 },
+    { "type": "bullets", "items": ["…", "…", "…"], "seconds": 5 },
+    { "type": "flow", "mermaid": "flowchart LR\n  A[Width] --> B{\"< 1440 px?\"}\n  B -- yes --> C[Icons]:::changed", "seconds": 6 },
+    { "type": "compare", "before": "before.png", "after": "after.png", "seconds": 5 },
+    { "type": "clip", "heading": "Recorded at 1280 px", "src": "run.webm", "caption": "e2e: checkout-fit", "speed": 1.5, "maxSeconds": 12 },
+    { "type": "key", "result": "../../review-key/331/result.json", "baseFails": true, "seconds": 7,
+      "rows": [{ "ok": true, "text": "`verify.sh` · 476 tests" }] },
+    { "type": "end", "title": "Ready for review", "lines": ["PR: **github.com/…/pull/352**", "3 am: …"], "seconds": 3 }
   ]
 }
 ```
@@ -58,7 +68,25 @@ Scenes: `title`, `bullets` (`items`, at most four), `flow` (`mermaid`, `legend: 
 (`result` = keycheck's result.json or an object; `verdict`, `baseFails`, `claim`, `rows` and `count`
 `{value, total, label}` override — e.g. one check that runs eight cases reads better as 8/8), `checks` (`items` with `name`, `detail`, `ok`), `end` (`title`, `lines`). Every scene takes `heading`,
 `kicker` and `seconds`. Leave out what the change does not have — a backend change has no `compare` or `clip`; a pure
-refactor has a `key` scene with parity and little else. Keep the whole video under a minute.
+refactor has a `key` scene with parity and little else.
+
+The `key` scene's left panel holds up to eight rows and takes `rows` of your own before the key's checks, so the tests
+go there as one row each (`"`verify.sh` · 476 tests"`) instead of in a `checks` scene after it. Use a separate
+`checks` scene only when there is no review key to show.
+
+### Wording
+
+The captions are read in the seconds they are on screen, so every word has to carry. Three rules, learned from demos
+that annoyed their reader:
+
+- **State the result, do not praise it.** The verdict stamp and "checked independently by key-reviewer" already say the
+  key passed and who checked. Adding "PASS, no cheating" or "fully verified" reads as the author marking their own
+  homework. Never editorialise about the verdict.
+- **Count labels are plain nouns**: `checks pass`, `cases identical`, `tests`. A verb like `fail`/`faller` as a label
+  turns "5/5" into a sentence that reads backwards — "5 of 5 fail" sounds like the change is broken when it means the
+  base branch is. If you need to say the base fails, that is the `baseFails` row, which words itself.
+- **No filler.** Cut "successfully", "as expected", "this ensures that", and any bullet that restates the title. If a
+  bullet would make a reviewer say "yes, obviously", it is not a bullet.
 
 ## 3. Render
 

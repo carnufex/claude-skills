@@ -101,7 +101,7 @@ const L = {
         flow: 'How it works now', compare: 'Before and after', frozen: 'Key frozen before the code', base: 'Fails on the base branch, as it should' },
   sv: { before: 'Före', after: 'Efter', pass: 'GODKÄND', fail: 'UNDERKÄND', weak: 'SVAG NYCKEL', reviewed: 'oberoende granskad av key-reviewer',
         identical: 'identiska', checksPassed: 'kontroller gröna', changed: 'ändrat', added: 'nytt', key: 'Review key', tests: 'Tester', what: 'Vad ändrades',
-        flow: 'Så fungerar det nu', compare: 'Före och efter', frozen: 'Nyckeln låstes före koden', base: 'Faller på main, som den ska' },
+        flow: 'Så fungerar det nu', compare: 'Före och efter', frozen: 'Nyckeln låstes före koden', base: 'Misslyckas på main, som den ska' },
 };
 const D = window.DEMO; const T = { ...L[D.lang === 'sv' ? 'sv' : 'en'], ...(D.strings || {}) };
 const host = document.getElementById('scene-host');
@@ -183,7 +183,7 @@ const builders = {
     if (s.baseFails !== undefined) rows.push({ ok: s.baseFails, text: T.base });
     const el = div(`${h2(s.heading || T.key, s.kicker)}<div class="keygrid">
       <div class="panel"><span class="badge">${esc(s.kind || r.kind || 'spec')}</span><div class="claim">${md(s.claim || r.claim || '')}</div>
-        <div class="rows">${rows.slice(0, 6).map((x) => `<div class="row"><span class="ic ${x.ok === false ? 'no' : ''}">${x.ok === false ? '✕' : '✓'}</span><span>${x.text}</span></div>`).join('')}</div></div>
+        <div class="rows">${rows.slice(0, 8).map((x) => `<div class="row"><span class="ic ${x.ok === false ? 'no' : ''}">${x.ok === false ? '✕' : '✓'}</span><span>${x.text}</span></div>`).join('')}</div></div>
       <div class="panel big"><div class="count"><span class="num" data-to="${good}">0</span><span class="of">/${total}</span></div>
         <div class="count-label">${esc(s.count?.label ?? (p ? T.identical : T.checksPassed))}</div>
         <div class="stamp ${verdict === 'PASS' ? '' : 'fail'}">${verdict === 'PASS' ? T.pass : verdict === 'FAIL' ? T.fail : T.weak}</div>

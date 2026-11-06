@@ -1,7 +1,7 @@
 {
   "name": "showcase",
-  "description": "Show a pull request instead of its code: a short rendered video (what changed, the flow as an animated flowchart, before/after, the recorded browser run, the review key's verdict, the tests) posted with the PR link to Slack.",
-  "version": "1.1.0",
+  "description": "Show a pull request instead of its code: a short rendered video (what changed, how it works now, before and after, the fix running, and the review key and tests together) posted with the PR link to Slack.",
+  "version": "1.2.0",
   "author": {
     "name": "Christopher Rosenvall",
     "url": "https://github.com/carnufex"
