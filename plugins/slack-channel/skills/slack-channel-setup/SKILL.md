@@ -39,7 +39,10 @@ SLACK_APP_TOKEN=xapp-…
 
 - `users`: Slack user IDs allowed to talk to the session (profile → ⋯ → Copy member ID). The gate is on the sender, never
   the channel: anyone else in the channel is ignored.
-- `channels`: channel IDs the session listens in (channel details → bottom). DMs with the app pass when `dm` is true.
+- `channels`: channel IDs the session listens in (channel details → bottom), as a list, or as an object from channel ID
+  to a repository folder — `{ "C…": "D:/Github/cmdb" }` — so a message in that channel is about that repository: it
+  arrives with a `repo` attribute and the session works there. One channel per repository you talk about often; the DM
+  for everything else (`dmRepo` gives the DM a folder too). DMs with the app pass when `dm` is true.
 - `requireMention`: only messages that mention the app, for a channel shared with other talk.
 - `announce`: where it says "listening on <computer>" when it starts and "stopped" when it ends; also where tool approvals
   go before any conversation has started.

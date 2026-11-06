@@ -73,7 +73,8 @@ Facts about THIS repository only; the skills hold the method. A missing section 
 
 - Slack: <channel id for PR demos, e.g. a `#pr-demos` channel the bot is in>; posted as the bot with the showcase plugin's
   `post-slack.mjs` (token from `SLACK_BOT_TOKEN` or the slack-channel plugin's `.env`)
-- What: the PR link, three lines on what changed, the review key verdict, the demo video
+- What: the PR link, three lines on what changed, the review key verdict, the demo video; one thread per PR, with
+  CI, merge, deploy and the live check as replies (`--pr`)
 
 ## Merge
 

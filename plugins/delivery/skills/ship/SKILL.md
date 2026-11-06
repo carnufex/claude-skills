@@ -71,6 +71,13 @@ Report the deploy as done only after:
 Comment on the issue: the deployed version (tag or commit), what you checked live, numbers when relevant. The PR's
 `Closes #<n>` closes it; release the claim and clear in-progress status (`work-issue`), or move the board card to *Done*.
 
+## Tell the PR's thread
+
+When the profile's *Notify* names a channel, every step after the PR is a reply in the PR's Slack thread (started by the
+`pr-demo` demo; `post-slack.mjs --pr <url> --text-file <f>` from the showcase plugin finds it): CI red or green, a review
+round, merged, deployed (the version), the live check (what you saw), a rollback. The final outcome — live and checked,
+or rolled back — with `--broadcast`, so it also shows in the channel. Short: one line per fact, a link when there is one.
+
 ## Roll back
 
 Revert, do not patch around: revert the PR (or, when the profile says so, the deploy commit in the GitOps repository) and let

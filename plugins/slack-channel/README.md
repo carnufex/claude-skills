@@ -8,7 +8,7 @@ dependencies) that Claude Code starts with the session. It keeps an outbound Sla
 your machine is exposed.
 
 - Messages from allowlisted Slack users (in a DM with the app or in chosen channels) arrive in the session; 👀 marks them
-  received.
+  received. A channel can be tied to a repository folder (`#claude-cmdb` → the cmdb checkout): the session then works there.
 - Claude answers in the same thread with `reply` (Markdown), reacts with `react`, and shares screenshots, videos and
   reports with `upload_file`. Files you attach in Slack are saved locally for it to read.
 - Tool approvals the session would ask in the terminal appear in Slack as **Allow / Deny** buttons.

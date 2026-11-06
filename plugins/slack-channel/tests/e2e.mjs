@@ -41,7 +41,7 @@ srv.on('upgrade', (req, s, head) => wss.handleUpgrade(req, s, head, (w) => {
 await new Promise((r) => srv.listen(0, '127.0.0.1', r));
 
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'slackch-'));
-fs.writeFileSync(path.join(dir, 'access.json'), JSON.stringify({ users: ['U1'], channels: ['C1'], announce: 'C1' }));
+fs.writeFileSync(path.join(dir, 'access.json'), JSON.stringify({ users: ['U1'], channels: { C1: 'D:/repos/one', C2: '' }, announce: 'C1' }));
 const child = spawn(process.execPath, [SERVER], {
   env: { ...process.env, SLACK_API_BASE: `http://127.0.0.1:${srv.address().port}/api`, SLACK_BOT_TOKEN: 'xoxb-test', SLACK_APP_TOKEN: 'xapp-test', SLACK_CHANNEL_DIR: dir, SLACK_CHANNEL_LISTEN: '1' },
   stdio: ['pipe', 'pipe', 'pipe'],
@@ -100,6 +100,7 @@ check(calls.find((c) => c.method === 'apps.connections.open').auth === 'Bearer x
 sock.send(JSON.stringify({ type: 'events_api', envelope_id: 'E1', payload: { event: { type: 'message', user: 'U1', channel: 'C1', channel_type: 'channel', ts: '1.1', text: 'hej &lt;3 <@UBOT> kör testerna' } } }));
 const ev = await until(() => out.find((m) => m.method === 'notifications/claude/channel'), 'channel notification');
 check(ev.params.content === 'hej <3 kör testerna' && ev.params.meta.chat_id === 'C1' && ev.params.meta.thread_ts === '1.1' && ev.params.meta.user === 'U1', 'forwards the message with chat_id, thread_ts and user, mention stripped, entities decoded');
+check(ev.params.meta.repo === 'D:/repos/one', 'a message in a mapped channel carries its repository folder');
 await until(() => acks.includes('E1'), 'ack E1');
 check(true, 'acknowledges the envelope');
 await until(() => calls.find((c) => c.method === 'reactions.add' && c.args.name === 'eyes'), 'eyes reaction');
@@ -116,6 +117,10 @@ await until(() => acks.includes('E6'), 'acks');
 await sleep(200);
 const now = out.filter((m) => m.method === 'notifications/claude/channel');
 check(now.length === before + 1 && now.at(-1).params.content === 'dm', 'drops other users, other channels, bots and duplicates; passes a DM');
+check(!('repo' in now.at(-1).params.meta), 'a DM has no repository unless dmRepo is set');
+sock.send(JSON.stringify({ type: 'events_api', envelope_id: 'E6b', payload: { event: { type: 'message', user: 'U1', channel: 'C2', channel_type: 'channel', ts: '1.65', text: 'unmapped channel' } } }));
+const c2 = await until(() => out.find((m) => m.method === 'notifications/claude/channel' && m.params.content === 'unmapped channel'), 'C2 message');
+check(c2.params.meta.chat_id === 'C2' && !('repo' in c2.params.meta), 'a channel listed without a folder passes without repo');
 
 // 5. reply tool
 rpc({ id: 3, method: 'tools/call', params: { name: 'reply', arguments: { chat_id: 'C1', thread_ts: '1.1', text: '**Klart:** 476 tester gröna, [PR](https://example.com/pr/1)' } } });

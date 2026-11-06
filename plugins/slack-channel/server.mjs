@@ -13,7 +13,7 @@
 //
 // No dependencies: Node 22+ (global fetch and WebSocket). Configuration, all optional except the two tokens:
 //   ~/.claude/channels/slack/.env          SLACK_BOT_TOKEN=xoxb-…  SLACK_APP_TOKEN=xapp-…  (environment variables win)
-//   ~/.claude/channels/slack/access.json   { "users": ["U…"], "channels": ["C…"], "dm": true,
+//   ~/.claude/channels/slack/access.json   { "users": ["U…"], "channels": ["C…"] or { "C…": "<repo folder>" }, "dm": true,
 //                                            "requireMention": false, "announce": "C…" }
 // Everything this process logs goes to stderr: stdout belongs to the MCP protocol.
 
@@ -21,7 +21,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-const VERSION = '1.0.1';
+const VERSION = '1.1.0';
 const LISTEN = /^(1|true|yes)$/i.test(process.env.SLACK_CHANNEL_LISTEN || '');
 const DIR = process.env.SLACK_CHANNEL_DIR || path.join(os.homedir(), '.claude', 'channels', 'slack');
 const API = (process.env.SLACK_API_BASE || 'https://slack.com/api').replace(/\/$/, '');
@@ -42,9 +42,17 @@ function readAccess() {
   let a = {};
   try { a = JSON.parse(fs.readFileSync(path.join(DIR, 'access.json'), 'utf8')); } catch { /* defaults */ }
   const list = (v) => (Array.isArray(v) ? v : String(v || '').split(',')).map((s) => String(s).trim()).filter(Boolean);
+  // channels: a list of ids, or { "<id>": "<repository folder>" } so a message there is about that repository.
+  const ch = process.env.SLACK_CHANNELS ? list(process.env.SLACK_CHANNELS) : a.channels;
+  const channels = new Map(
+    ch && typeof ch === 'object' && !Array.isArray(ch)
+      ? Object.entries(ch).map(([id, repo]) => [id.trim(), String(repo || '').trim()])
+      : list(ch).map((id) => [id, '']),
+  );
   return {
     users: new Set(list(process.env.SLACK_ALLOWED_USERS || a.users)),
-    channels: new Set(list(process.env.SLACK_CHANNELS || a.channels)),
+    channels,
+    dmRepo: String(a.dmRepo || '').trim(),
     dm: a.dm !== false,
     requireMention: !!a.requireMention,
     announce: process.env.SLACK_ANNOUNCE_CHANNEL || a.announce || '',
@@ -154,6 +162,7 @@ const INSTRUCTIONS = [
   'The person cannot see the terminal: put everything they need in the reply (what you did, what you found, links), in Markdown, short paragraphs.',
   'For long work, send a short `reply` first ("on it: …"), then the result. Share screenshots, videos and reports with `upload_file`.',
   'Files attached in Slack are saved locally; their paths are listed in the message.',
+  'When the tag has a repo attribute, the message was written in the Slack channel of that repository: it is about that repository, so work in that folder (absolute paths; `cd` there in shell commands) unless the message says otherwise.',
 ].join(' ');
 
 const TOOLS = [
@@ -388,12 +397,13 @@ async function onEvent(e) {
   const v = VERDICT_RE.exec(text);
   if (v && pending.has(v[2].toLowerCase())) return verdict(v[2].toLowerCase(), /^(y|ja)/i.test(v[1]), e.user);
   const threadTs = e.thread_ts || e.ts;
+  const repo = e.channel_type === 'im' ? access.dmRepo : access.channels.get(e.channel) || '';
   remember(e.channel, threadTs);
   const files = await downloadFiles(e.files, e.ts);
   const content = files.length ? `${text}\n\nAttached files, saved locally:\n${files.map((f) => `- ${f}`).join('\n')}` : text;
   notify('notifications/claude/channel', {
     content: content || '(empty message)',
-    meta: { chat_id: e.channel, thread_ts: threadTs, message_ts: e.ts, user: e.user, channel_type: e.channel_type || 'channel' },
+    meta: { chat_id: e.channel, thread_ts: threadTs, message_ts: e.ts, user: e.user, channel_type: e.channel_type || 'channel', ...(repo ? { repo } : {}) },
   });
   slack('reactions.add', { channel: e.channel, timestamp: e.ts, name: 'eyes' }).catch(() => {});
 }

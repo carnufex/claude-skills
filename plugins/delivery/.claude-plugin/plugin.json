@@ -1,7 +1,7 @@
 {
   "name": "delivery",
   "description": "From issue to verified production: write ready issues with a review key, claim and work them with an independent key-reviewer agent, plan milestones, ask and record human decisions, and ship (verify, PR, merge, GitOps deploy, live check, rollback). Repository facts live in .claude/profiles/delivery.md.",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "author": {
     "name": "Christopher Rosenvall",
     "url": "https://github.com/carnufex"

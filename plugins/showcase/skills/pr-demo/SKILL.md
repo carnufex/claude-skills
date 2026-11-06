@@ -78,10 +78,12 @@ them. Text cut off, an empty diagram, a clip of a login screen: fix and render a
 
 To the channel the profile's *Notify* names, **as the bot**, so the person gets a real notification (a message posted
 through a Slack connector comes from the person themselves, and Slack does not notify anyone of their own messages).
-Write the message to a file — it must stand on its own (Slack mrkdwn):
+**One thread per PR**: the demo starts the PR's thread; everything after it — CI, review rounds, merge, deploy, the live
+check, a rollback — is a reply in that thread (`ship` posts those). The channel stays one line per PR, across all
+repositories. Write the message to a file; it must stand on its own (Slack mrkdwn) and start with the repository:
 
 ```text
-*<PR title>* — <repo> PR #<n> is ready for review
+*<repo>* · PR #<n> · <title> — ready for review
 <PR url>
 • <what changed, line 1>
 • <line 2>
@@ -90,13 +92,16 @@ Review key (<kind>): *PASS*, checked independently: <one line from the verdict>
 ```
 
 ```bash
-node <this skill's directory>/scripts/post-slack.mjs --channel <id> --file out/demo/<n>/demo.mp4   --title "<repo> PR #<n>: <title> (<seconds> s)" --comment-file out/demo/<n>/message.md
+node <this skill's directory>/scripts/post-slack.mjs --channel <id> --pr <PR url> --file out/demo/<n>/demo.mp4 --title "<repo> PR #<n>: <title> (<seconds> s)" --comment-file out/demo/<n>/message.md
+node <this skill's directory>/scripts/post-slack.mjs --channel <id> --pr <PR url> --text-file update.md [--broadcast]
 ```
 
-It prints the file's permalink. The bot token comes from `SLACK_BOT_TOKEN` or the slack-channel plugin's
-`~/.claude/channels/slack/.env`; the bot must be in the channel (`not_in_channel`: `/invite @<bot>`). Without a bot,
-fall back to the Slack connector (`slack_get_file_upload_url` → POST the bytes → `slack_complete_file_upload`), and
-say that no notification goes out.
+`--pr` finds the PR's thread by its url in the channel (no state kept): found, the post goes into the thread; not found,
+it starts it. `--text-file` posts a message without a file; `--broadcast` also shows a thread reply in the channel (use
+it for the outcome: live, or rolled back). It prints the thread and permalink. The bot token comes from
+`SLACK_BOT_TOKEN` or the slack-channel plugin's `~/.claude/channels/slack/.env`; the bot must be in the channel
+(`not_in_channel`: `/invite @<bot>`). Without a bot, fall back to the Slack connector (`slack_get_file_upload_url` →
+POST the bytes → `slack_complete_file_upload`), and say that no notification goes out.
 
 Put the same three lines, the mermaid flowchart and the Slack link in the PR description (GitHub draws mermaid; it does
 not play a video uploaded through the API).
