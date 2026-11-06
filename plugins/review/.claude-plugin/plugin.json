@@ -7,5 +7,12 @@
     "url": "https://github.com/carnufex"
   },
   "repository": "https://github.com/carnufex/claude-skills",
-  "keywords": ["code-review", "security", "pull-request", "audit", "observability"]
+  "keywords": [
+    "code-review",
+    "security",
+    "pull-request",
+    "audit",
+    "observability"
+  ],
+  "license": "MIT"
 }

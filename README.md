@@ -20,15 +20,15 @@ A repository can pin the plugins it uses in its own `.claude/settings.json`, so 
 }
 ```
 
-The repository is private: installing needs a git login that can read it (`gh auth login` with the Git credential helper
-is enough). Background auto-update of a private marketplace also needs `GITHUB_TOKEN` in the environment.
-
 ## Plugins
 
-| Plugin | Skills | Profile | Used by |
-|---|---|---|---|
-| **review** | `review-sweep` (whole codebase or one area → verified findings → one GitHub issue each) · `review-hotspots` (one PR → a "look here first" map of at most three entries, then at most five findings) | `.claude/profiles/review.md` | Lots |
-| **gitops** | `gitops-app-onboarding` (new app in an ArgoCD ApplicationSet cluster: whitelists, secrets, storage, routes, the 3 am alert) | `.claude/profiles/gitops.md` | Rosenvalls-Homelab |
+| Plugin | Skills | Profile |
+|---|---|---|
+| **review** | `review-sweep` (whole codebase or one area → verified findings → one GitHub issue each) · `review-hotspots` (one PR → a "look here first" map of at most three entries, then at most five findings) | `.claude/profiles/review.md` |
+| **gitops** | `gitops-app-onboarding` (new app in an ArgoCD ApplicationSet cluster: whitelists, secrets, storage, routes, the 3 am alert) | `.claude/profiles/gitops.md` |
+
+This repository is public: nothing here may name a host, an address, a secret or a private repository's internals. Those
+belong in the profile files of the repositories that use the skills.
 
 ## Principles the skills share
 
@@ -68,3 +68,7 @@ orchestrating session owns correctness and re-verifies every high-severity findi
 
 The profile pattern, the 3 am question and the shape of `review-hotspots` come from Mattias Jonsson's
 [m0x6A/claude-skills](https://github.com/m0x6A/claude-skills) (MIT). The text here is rewritten for these repositories.
+
+## Licence
+
+MIT. See [LICENSE](LICENSE).

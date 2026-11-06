@@ -13,7 +13,13 @@
       "version": "1.0.0",
       "source": "./plugins/review",
       "category": "development",
-      "keywords": ["code-review", "security", "pull-request", "audit", "observability"]
+      "keywords": [
+        "code-review",
+        "security",
+        "pull-request",
+        "audit",
+        "observability"
+      ]
     },
     {
       "name": "gitops",
@@ -21,7 +27,13 @@
       "version": "1.0.0",
       "source": "./plugins/gitops",
       "category": "devops",
-      "keywords": ["kubernetes", "argocd", "gitops", "external-secrets", "gateway-api"]
+      "keywords": [
+        "kubernetes",
+        "argocd",
+        "gitops",
+        "external-secrets",
+        "gateway-api"
+      ]
     }
   ]
 }

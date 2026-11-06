@@ -7,5 +7,12 @@
     "url": "https://github.com/carnufex"
   },
   "repository": "https://github.com/carnufex/claude-skills",
-  "keywords": ["kubernetes", "argocd", "gitops", "external-secrets", "gateway-api"]
+  "keywords": [
+    "kubernetes",
+    "argocd",
+    "gitops",
+    "external-secrets",
+    "gateway-api"
+  ],
+  "license": "MIT"
 }
