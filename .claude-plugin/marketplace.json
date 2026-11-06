@@ -72,7 +72,7 @@
     {
       "name": "slack-channel",
       "description": "Chat in Slack with the Claude Code session on your own computer: a Claude Code channel over Slack Socket Mode, replies in threads, file uploads, and tool approvals as Allow/Deny buttons.",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "source": "./plugins/slack-channel",
       "category": "productivity",
       "keywords": [

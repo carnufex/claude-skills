@@ -40,8 +40,11 @@ if ($Register) {
   return
 }
 
-$claude = (Get-Command claude -ErrorAction SilentlyContinue).Source
-if (-not $claude) { throw 'claude is not on PATH' }
+# A program Windows Terminal can start: claude.exe, or the npm shim claude.cmd. Never claude.ps1, which only PowerShell
+# can run (wt fails with 0x800700c1).
+$claude = Get-Command claude -CommandType Application -ErrorAction SilentlyContinue |
+  Where-Object { $_.Extension -in '.exe', '.cmd' } | Select-Object -First 1 -ExpandProperty Source
+if (-not $claude) { throw 'claude.exe or claude.cmd is not on PATH' }
 # Only this session listens to Slack: the plugin's server in every other session stays off Socket Mode.
 $cfgDir = Join-Path $HOME '.claude\channels\slack'
 New-Item -ItemType Directory -Force $cfgDir | Out-Null
