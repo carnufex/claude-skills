@@ -76,12 +76,9 @@ them. Text cut off, an empty diagram, a clip of a login screen: fix and render a
 
 ## 4. Post
 
-Where the profile's *Notify* says. With the Slack connector in the session:
-
-1. `slack_get_file_upload_url` with `filename` `demo.mp4` and the exact byte size;
-2. POST the bytes: `URL='<upload_url>' && curl -sS -X POST "$URL" -H 'Content-Type: video/mp4' --data-binary @demo.mp4`
-   (keep the URL byte for byte);
-3. `slack_complete_file_upload` with the profile's channel id and an `initial_comment` that stands on its own:
+To the channel the profile's *Notify* names, **as the bot**, so the person gets a real notification (a message posted
+through a Slack connector comes from the person themselves, and Slack does not notify anyone of their own messages).
+Write the message to a file — it must stand on its own (Slack mrkdwn):
 
 ```text
 *<PR title>* — <repo> PR #<n> is ready for review
@@ -92,10 +89,14 @@ Review key (<kind>): *PASS*, checked independently: <one line from the verdict>
 3 am: <signal>
 ```
 
-A message posted through the connector comes from the person themselves, so Slack does not notify them of it. For a real
-notification, the profile names a bot (`SLACK_BOT_TOKEN`, a Slack app with `files:write` and `chat:write` in the
-channel): post with Slack's `files.getUploadURLExternal` → upload → `files.completeUploadExternal` (`channel_id`,
-`initial_comment`).
+```bash
+node <this skill's directory>/scripts/post-slack.mjs --channel <id> --file out/demo/<n>/demo.mp4   --title "<repo> PR #<n>: <title> (<seconds> s)" --comment-file out/demo/<n>/message.md
+```
+
+It prints the file's permalink. The bot token comes from `SLACK_BOT_TOKEN` or the slack-channel plugin's
+`~/.claude/channels/slack/.env`; the bot must be in the channel (`not_in_channel`: `/invite @<bot>`). Without a bot,
+fall back to the Slack connector (`slack_get_file_upload_url` → POST the bytes → `slack_complete_file_upload`), and
+say that no notification goes out.
 
 Put the same three lines, the mermaid flowchart and the Slack link in the PR description (GitHub draws mermaid; it does
 not play a video uploaded through the API).

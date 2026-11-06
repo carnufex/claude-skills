@@ -10,7 +10,7 @@
     {
       "name": "delivery",
       "description": "From issue to verified production: ready issues with a review key, race-safe claims, an implementer/reviewer loop that an independent key-reviewer agent must pass, milestone planning, needs-human decisions recorded as ADRs, and shipping through GitOps with a live check and rollback by revert.",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "source": "./plugins/delivery",
       "category": "development",
       "keywords": [
@@ -57,7 +57,7 @@
     {
       "name": "showcase",
       "description": "Show a pull request instead of its code: a short rendered video of what changed, the animated flow, before/after, the recorded run and the review key's verdict, posted with the PR link to Slack.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "source": "./plugins/showcase",
       "category": "development",
       "keywords": [

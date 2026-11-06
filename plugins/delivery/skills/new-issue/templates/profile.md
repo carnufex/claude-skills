@@ -71,7 +71,8 @@ Facts about THIS repository only; the skills hold the method. A missing section 
 
 ## Notify
 
-- Slack: <channel or DM id, e.g. the person's own DM `D0…`>; via <the Slack connector in the session | `SLACK_BOT_TOKEN`>
+- Slack: <channel id for PR demos, e.g. a `#pr-demos` channel the bot is in>; posted as the bot with the showcase plugin's
+  `post-slack.mjs` (token from `SLACK_BOT_TOKEN` or the slack-channel plugin's `.env`)
 - What: the PR link, three lines on what changed, the review key verdict, the demo video
 
 ## Merge
