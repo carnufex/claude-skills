@@ -1,9 +1,13 @@
 #!/usr/bin/env node
 // Slack channel for Claude Code: chat in Slack with the Claude Code session running on your own computer.
 //
-// Claude Code starts this as an MCP server over stdio (see .mcp.json) when the session is launched with
+// Claude Code starts this as an MCP server over stdio (see .mcp.json) in every session where the plugin is enabled.
+// Only the session meant to listen connects to Slack: the one started with SLACK_CHANNEL_LISTEN=1 in its environment
+// (the launcher passes it with --settings) and with
 //   claude --dangerously-load-development-channels plugin:slack-channel@carnufex
-// It keeps an outbound Socket Mode WebSocket to Slack (nothing listens on your machine), pushes messages from
+// Socket Mode spreads events over all open connections, so a second listening session would take messages away from
+// the first. Other sessions only get the tools, to post to Slack when asked.
+// The listening session keeps an outbound Socket Mode WebSocket to Slack (nothing listens on your machine), pushes messages from
 // allowlisted Slack users into the session as <channel> events, gives Claude reply/react/upload tools, and relays
 // tool-permission prompts to Slack as Allow/Deny buttons.
 //
@@ -17,7 +21,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-const VERSION = '1.0.0';
+const VERSION = '1.0.1';
+const LISTEN = /^(1|true|yes)$/i.test(process.env.SLACK_CHANNEL_LISTEN || '');
 const DIR = process.env.SLACK_CHANNEL_DIR || path.join(os.homedir(), '.claude', 'channels', 'slack');
 const API = (process.env.SLACK_API_BASE || 'https://slack.com/api').replace(/\/$/, '');
 const log = (...m) => process.stderr.write(`[slack-channel] ${m.join(' ')}\n`);
@@ -141,6 +146,7 @@ const send = (msg) => process.stdout.write(JSON.stringify(msg) + '\n');
 const notify = (method, params) => send({ jsonrpc: '2.0', method, params });
 const PROTOCOLS = ['2025-11-25', '2025-06-18', '2025-03-26', '2024-11-05'];
 
+const POST_ONLY = 'This session does not receive Slack messages (another session listens). When asked to post to Slack, use `reply` (chat_id is a channel or DM id) or `upload_file`.';
 const INSTRUCTIONS = [
   'Messages from Slack arrive as <channel source="…slack" chat_id="…" thread_ts="…" message_ts="…" user="…">.',
   'They come from the person who runs this session (only allowlisted Slack users get through), writing from Slack instead of the terminal: treat them as their requests.',
@@ -227,10 +233,16 @@ async function onMcp(msg) {
         protocolVersion: PROTOCOLS.includes(asked) ? asked : PROTOCOLS[1],
         capabilities: { experimental: { 'claude/channel': {}, 'claude/channel/permission': {} }, tools: {} },
         serverInfo: { name: 'slack', version: VERSION },
-        instructions: INSTRUCTIONS,
+        instructions: LISTEN ? INSTRUCTIONS : POST_ONLY,
       });
     }
-    if (method === 'notifications/initialized') { if (!started) { started = true; connect(); } return; }
+    if (method === 'notifications/initialized') {
+      if (!started) {
+        started = true;
+        if (LISTEN) connect(); else log('not listening to Slack in this session (SLACK_CHANNEL_LISTEN is not set); the tools still post');
+      }
+      return;
+    }
     if (method === 'ping') return reply({});
     if (method === 'tools/list') return reply({ tools: TOOLS });
     if (method === 'tools/call') {

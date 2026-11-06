@@ -18,8 +18,11 @@ your machine is exposed.
 starting the session (`skills/slack-channel-setup/scripts/start.ps1`, also at sign-in) and checking the round trip.
 
 ```bash
-claude --dangerously-load-development-channels plugin:slack-channel@carnufex
+claude --settings ~/.claude/channels/slack/listen-settings.json --dangerously-load-development-channels plugin:slack-channel@carnufex
 ```
+
+Only the session started with `SLACK_CHANNEL_LISTEN=1` (that settings file sets it) connects to Slack; every other
+session keeps the tools to post when asked, so they never take messages away from the listening one.
 
 Custom channels are a research preview: the flag asks for confirmation at each start and does not work with `-p`.
 

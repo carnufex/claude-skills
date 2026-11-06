@@ -42,7 +42,12 @@ if ($Register) {
 
 $claude = (Get-Command claude -ErrorAction SilentlyContinue).Source
 if (-not $claude) { throw 'claude is not on PATH' }
-$claudeArgs = @('--dangerously-load-development-channels', $Plugin)
+# Only this session listens to Slack: the plugin's server in every other session stays off Socket Mode.
+$cfgDir = Join-Path $HOME '.claude\channels\slack'
+New-Item -ItemType Directory -Force $cfgDir | Out-Null
+$sessionSettings = Join-Path $cfgDir 'listen-settings.json'
+Set-Content -Path $sessionSettings -Value '{ "env": { "SLACK_CHANNEL_LISTEN": "1" } }' -Encoding ascii
+$claudeArgs = @('--settings', $sessionSettings, '--dangerously-load-development-channels', $Plugin)
 foreach ($d in $AddDir) { $claudeArgs += @('--add-dir', $d) }
 
 $wt = (Get-Command wt.exe -ErrorAction SilentlyContinue).Source

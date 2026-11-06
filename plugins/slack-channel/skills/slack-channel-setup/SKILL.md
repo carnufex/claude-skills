@@ -49,8 +49,14 @@ SLACK_APP_TOKEN=xapp-…
 ## 3. Start
 
 ```bash
-claude --dangerously-load-development-channels plugin:slack-channel@carnufex
+echo '{ "env": { "SLACK_CHANNEL_LISTEN": "1" } }' > ~/.claude/channels/slack/listen-settings.json
+claude --settings ~/.claude/channels/slack/listen-settings.json --dangerously-load-development-channels plugin:slack-channel@carnufex
 ```
+
+**Exactly one session listens.** The plugin's server runs in every session where the plugin is enabled, but only the one
+with `SLACK_CHANNEL_LISTEN=1` connects to Slack: Socket Mode spreads events over all open connections, so a second
+listener would take messages away from the first. Every other session still has the tools and can post to Slack when
+asked.
 
 Custom channels are a research preview: Claude Code shows a confirmation for the development channel at every start
 (choose *I am using this for local development*) and the flag does not work with `-p`. Start it in the folder the

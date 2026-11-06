@@ -43,7 +43,7 @@ await new Promise((r) => srv.listen(0, '127.0.0.1', r));
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'slackch-'));
 fs.writeFileSync(path.join(dir, 'access.json'), JSON.stringify({ users: ['U1'], channels: ['C1'], announce: 'C1' }));
 const child = spawn(process.execPath, [SERVER], {
-  env: { ...process.env, SLACK_API_BASE: `http://127.0.0.1:${srv.address().port}/api`, SLACK_BOT_TOKEN: 'xoxb-test', SLACK_APP_TOKEN: 'xapp-test', SLACK_CHANNEL_DIR: dir },
+  env: { ...process.env, SLACK_API_BASE: `http://127.0.0.1:${srv.address().port}/api`, SLACK_BOT_TOKEN: 'xoxb-test', SLACK_APP_TOKEN: 'xapp-test', SLACK_CHANNEL_DIR: dir, SLACK_CHANNEL_LISTEN: '1' },
   stdio: ['pipe', 'pipe', 'pipe'],
 });
 const out = [];
@@ -55,6 +55,27 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const until = async (fn, what, ms = 3000) => { const t = Date.now(); while (Date.now() - t < ms) { const v = fn(); if (v) return v; await sleep(25); } throw new Error(`timeout: ${what}\nstderr: ${errlog}`); };
 let failures = 0;
 const check = (cond, name) => { console.log(`${cond ? 'PASS' : 'FAIL'} ${name}`); if (!cond) failures++; };
+
+// 0. a session that is not the listener never connects, but its tools post
+{
+  const quiet = spawn(process.execPath, [SERVER], {
+    env: { ...process.env, SLACK_API_BASE: `http://127.0.0.1:${srv.address().port}/api`, SLACK_BOT_TOKEN: 'xoxb-test', SLACK_APP_TOKEN: 'xapp-test', SLACK_CHANNEL_DIR: dir, SLACK_CHANNEL_LISTEN: '' },
+    stdio: ['pipe', 'pipe', 'pipe'],
+  });
+  let qbuf = '';
+  const qout = [];
+  quiet.stdout.on('data', (d) => { qbuf += d; let i; while ((i = qbuf.indexOf('\n')) >= 0) { qout.push(JSON.parse(qbuf.slice(0, i))); qbuf = qbuf.slice(i + 1); } });
+  const q = (m) => quiet.stdin.write(JSON.stringify({ jsonrpc: '2.0', ...m }) + '\n');
+  q({ id: 1, method: 'initialize', params: { protocolVersion: '2025-06-18' } });
+  q({ method: 'notifications/initialized' });
+  const qi = await until(() => qout.find((m) => m.id === 1), 'quiet initialize');
+  q({ id: 2, method: 'tools/call', params: { name: 'reply', arguments: { chat_id: 'C1', text: 'from another session' } } });
+  await until(() => qout.find((m) => m.id === 2), 'quiet reply');
+  await sleep(300);
+  check(/does not receive Slack messages/.test(qi.result.instructions) && !calls.some((c) => c.method === 'apps.connections.open') && calls.some((c) => c.method === 'chat.postMessage' && c.args.text === 'from another session'), 'without SLACK_CHANNEL_LISTEN it never opens Socket Mode, but reply still posts');
+  quiet.kill();
+  calls.length = 0;
+}
 
 // 1. handshake
 rpc({ id: 1, method: 'initialize', params: { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 'test', version: '0' } } });
