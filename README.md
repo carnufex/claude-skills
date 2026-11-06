@@ -1,11 +1,13 @@
 # carnufex — Claude Code skills marketplace
 
-Skills shared across my repositories. The skills hold the **method**; each repository keeps its own **facts** in a small
+Skills shared across my repositories: the same way of going from an issue to verified production, of reviewing, and of
+putting an app into the cluster. The skills hold the **method**; each repository keeps its own **facts** in a small
 profile file, `.claude/profiles/<name>.md`, that the skill reads (and writes from a template on first use if it is missing).
 One skill, many repositories, no copies drifting apart.
 
 ```text
 /plugin marketplace add carnufex/claude-skills
+/plugin install delivery@carnufex
 /plugin install review@carnufex
 ```
 
@@ -16,7 +18,7 @@ A repository can pin the plugins it uses in its own `.claude/settings.json`, so 
   "extraKnownMarketplaces": {
     "carnufex": { "source": { "source": "github", "repo": "carnufex/claude-skills" } }
   },
-  "enabledPlugins": { "review@carnufex": true }
+  "enabledPlugins": { "delivery@carnufex": true, "review@carnufex": true }
 }
 ```
 
@@ -24,6 +26,7 @@ A repository can pin the plugins it uses in its own `.claude/settings.json`, so 
 
 | Plugin | Skills | Profile |
 |---|---|---|
+| **delivery** | `new-issue` · `work-issue` (claim with the bundled race-safe `claim.mjs`, plan, branch, build) · `plan-milestone` · `decision` (needs-human questions, ADRs) · `ship` (verify → PR → merge → GitOps deploy → live check → rollback) | `.claude/profiles/delivery.md` |
 | **review** | `review-sweep` (whole codebase or one area → verified findings → one GitHub issue each) · `review-hotspots` (one PR → a "look here first" map of at most three entries, then at most five findings) | `.claude/profiles/review.md` |
 | **gitops** | `gitops-app-onboarding` (new app in an ArgoCD ApplicationSet cluster: whitelists, secrets, storage, routes, the 3 am alert) | `.claude/profiles/gitops.md` |
 
