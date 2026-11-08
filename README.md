@@ -14,7 +14,9 @@ One skill, many repositories, no copies drifting apart.
 /plugin install guardrails@carnufex
 ```
 
-A repository can pin the plugins it uses in its own `.claude/settings.json`, so every session there gets them:
+A repository can enable the plugins it uses in its own `.claude/settings.json`, for every session there. Enabling does not
+install: on each machine the plugin must also be installed once at project scope (`tools/update-local.mjs --scan` does it,
+see [Updating](#updating)), or sessions there start without it.
 
 ```json
 {
@@ -24,6 +26,19 @@ A repository can pin the plugins it uses in its own `.claude/settings.json`, so 
   "enabledPlugins": { "delivery@carnufex": true, "review@carnufex": true, "showcase@carnufex": true }
 }
 ```
+
+## Updating
+
+Sessions load plugins when they start and keep that version. After a push, on each machine:
+
+```bash
+node tools/update-local.mjs --scan ~/src   # refresh the marketplace, update every installed plugin, install what repos enable
+```
+
+It updates user- and project-scope installs, installs the plugins that a repository directly under a `--scan` folder
+enables but that were never installed on this machine (a worktree uses its main checkout's installs), and reverts the
+reformat `claude plugin install` makes to a clean `settings.json`. `--dry-run` only says what it would do. Then restart the
+running sessions.
 
 ## Plugins
 
@@ -71,6 +86,7 @@ orchestrating session owns correctness and re-verifies every high-severity findi
 2. Bump the plugin's `version` in **both** `plugins/<plugin>/.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`.
 3. Mention every skill in this README and in the plugin's README.
 4. Run `tools/validate.sh` before pushing; CI runs the same checks on every push and pull request.
+5. After the push, run `node tools/update-local.mjs --scan <your repository folders>` and restart running sessions.
 
 ## Evals
 
