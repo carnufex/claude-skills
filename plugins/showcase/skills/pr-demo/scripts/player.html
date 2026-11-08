@@ -178,7 +178,7 @@ const builders = {
     const verdict = (s.verdict || r.verdict || 'PASS').toUpperCase();
     const total = s.count?.total ?? (p ? p.cases : checks.length);
     const good = s.count?.value ?? (p ? p.identical : checks.filter((c) => c.ok).length);
-    const rows = [...(s.rows || []), ...checks.map((c) => ({ ok: c.ok, text: `<b>${md(c.name)}</b>${c.detail ? ' · ' + md(c.detail) : ''}` }))];
+    const rows = [...(s.rows || []).map((x) => ({ ...x, text: md(x.text) })), ...checks.map((c) => ({ ok: c.ok, text: `<b>${md(c.name)}</b>${c.detail ? ' · ' + md(c.detail) : ''}` }))];
     if (r.freeze) rows.unshift({ ok: !r.freeze.changed.length, text: T.frozen + ` <span class="mono">${esc(r.freeze.keyCommit.slice(0, 8))}</span>` });
     if (s.baseFails !== undefined) rows.push({ ok: s.baseFails, text: T.base });
     const el = div(`${h2(s.heading || T.key, s.kicker)}<div class="keygrid">

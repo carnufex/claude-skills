@@ -57,7 +57,7 @@
     {
       "name": "showcase",
       "description": "Show a pull request instead of its code: a short rendered video of what changed, the animated flow, before/after, the recorded run and the review key's verdict, posted with the PR link to Slack.",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "source": "./plugins/showcase",
       "category": "development",
       "keywords": [

@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 399" width="1200" height="399" role="img">
+<style>
+text { font-family: ui-monospace, SFMono-Regular, 'Cascadia Mono', Consolas, Menlo, monospace; font-size: 15px; white-space: pre; }
+@keyframes t0 { 0%, 1.24% { transform: translateX(0px); } 1.29%, 3.10% { transform: translateX(18.1px); } 5.09%, 100% { transform: translateX(108.4px); } }
+.t0 { transform: translateX(108.4px); animation: t0 19.338461538461537s infinite; animation-timing-function: steps(10, end); }
+@keyframes k0 { 0%, 1.03% { opacity: 0; } 1.29%, 7.16% { opacity: 1; } 7.42%, 100% { opacity: 0; } }
+.k0 { opacity: 0; animation: k0 19.338461538461537s step-end infinite; }
+@keyframes o1 { 0%, 7.42% { opacity: 0; } 8.19%, 100% { opacity: 1; } }
+.o1 { animation: o1 19.338461538461537s infinite; }
+@keyframes t2 { 0%, 11.25% { transform: translateX(0px); } 11.30%, 13.11% { transform: translateX(18.1px); } 20.86%, 100% { transform: translateX(370.2px); } }
+.t2 { transform: translateX(370.2px); animation: t2 19.338461538461537s infinite; animation-timing-function: steps(39, end); }
+@keyframes k2 { 0%, 11.04% { opacity: 0; } 11.30%, 22.93% { opacity: 1; } 23.19%, 100% { opacity: 0; } }
+.k2 { opacity: 0; animation: k2 19.338461538461537s step-end infinite; }
+@keyframes t3 { 0%, 22.88% { transform: translateX(0px); } 22.93%, 24.74% { transform: translateX(18.1px); } 36.48%, 100% { transform: translateX(550.8px); } }
+.t3 { transform: translateX(550.8px); animation: t3 19.338461538461537s infinite; animation-timing-function: steps(59, end); }
+@keyframes k3 { 0%, 22.67% { opacity: 0; } 22.93%, 38.54% { opacity: 1; } 38.80%, 100% { opacity: 0; } }
+.k3 { opacity: 0; animation: k3 19.338461538461537s step-end infinite; }
+@keyframes o4 { 0%, 38.80% { opacity: 0; } 39.58%, 100% { opacity: 1; } }
+.o4 { animation: o4 19.338461538461537s infinite; }
+@keyframes t5 { 0%, 42.63% { transform: translateX(0px); } 42.68%, 44.49% { transform: translateX(18.1px); } 46.08%, 100% { transform: translateX(90.3px); } }
+.t5 { transform: translateX(90.3px); animation: t5 19.338461538461537s infinite; animation-timing-function: steps(8, end); }
+@keyframes k5 { 0%, 42.42% { opacity: 0; } 42.68%, 48.15% { opacity: 1; } 48.41%, 100% { opacity: 0; } }
+.k5 { opacity: 0; animation: k5 19.338461538461537s step-end infinite; }
+@keyframes o6 { 0%, 48.41% { opacity: 0; } 49.18%, 100% { opacity: 1; } }
+.o6 { animation: o6 19.338461538461537s infinite; }
+@keyframes t7 { 0%, 52.24% { transform: translateX(0px); } 52.29%, 54.10% { transform: translateX(18.1px); } 63.64%, 100% { transform: translateX(451.5px); } }
+.t7 { transform: translateX(451.5px); animation: t7 19.338461538461537s infinite; animation-timing-function: steps(48, end); }
+@keyframes k7 { 0%, 52.03% { opacity: 0; } 52.29%, 65.71% { opacity: 1; } 65.97%, 100% { opacity: 0; } }
+.k7 { opacity: 0; animation: k7 19.338461538461537s step-end infinite; }
+@keyframes o8 { 0%, 65.97% { opacity: 0; } 66.75%, 100% { opacity: 1; } }
+.o8 { animation: o8 19.338461538461537s infinite; }
+@keyframes t9 { 0%, 69.80% { transform: translateX(0px); } 69.85%, 71.66% { transform: translateX(18.1px); } 75.44%, 100% { transform: translateX(189.6px); } }
+.t9 { transform: translateX(189.6px); animation: t9 19.338461538461537s infinite; animation-timing-function: steps(19, end); }
+@keyframes k9 { 0%, 69.59% { opacity: 0; } 69.85%, 77.51% { opacity: 1; } 77.76%, 100% { opacity: 0; } }
+.k9 { opacity: 0; animation: k9 19.338461538461537s step-end infinite; }
+@keyframes o10 { 0%, 77.76% { opacity: 0; } 78.54%, 100% { opacity: 1; } }
+.o10 { animation: o10 19.338461538461537s infinite; }
+@keyframes all { 0%, 96.90% { opacity: 1; } 99.48%, 100% { opacity: 0; } }
+.screen { animation: all 19.338461538461537s infinite; }
+
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+<defs>
+  <radialGradient id="gb" cx="88%" cy="-10%" r="70%"><stop offset="0" stop-color="#7aa2ff" stop-opacity=".20"/><stop offset="1" stop-color="#7aa2ff" stop-opacity="0"/></radialGradient>
+  <radialGradient id="gg" cx="-5%" cy="110%" r="60%"><stop offset="0" stop-color="#3fd27a" stop-opacity=".13"/><stop offset="1" stop-color="#3fd27a" stop-opacity="0"/></radialGradient>
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#fff" stroke-opacity=".035"/></pattern>
+  <linearGradient id="prog" x1="0" x2="1"><stop offset="0" stop-color="#7aa2ff"/><stop offset="1" stop-color="#3fd27a"/></linearGradient>
+  <filter id="glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="6"/></filter>
+</defs>
+<rect width="1200" height="399" rx="22" fill="#0b0f17"/>
+
+<rect x=".5" y=".5" width="1199" height="398" rx="21.5" fill="none" stroke="#263252"/>
+<rect x="0" y="0" width="1200" height="46" rx="22" fill="#121a2a"/><rect x="0" y="24" width="1200" height="22" fill="#121a2a"/>
+<line x1="0" y1="46" x2="1200" y2="46" stroke="#263252"/>
+<circle cx="30" cy="23" r="6.5" fill="#ff6b6b" fill-opacity=".85"/><circle cx="52" cy="23" r="6.5" fill="#f2b84b" fill-opacity=".85"/><circle cx="74" cy="23" r="6.5" fill="#3fd27a" fill-opacity=".85"/>
+<text x="600" y="28" text-anchor="middle" fill="#8e9ab3" style="font-family: 'Segoe UI', Inter, -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; font-size: 13.5px">Claude's Bash tool · guardrails PreToolUse hook</text>
+<g class="screen">
+<text x="40" y="84"><tspan fill="#7aa2ff">$</tspan><tspan fill="#e8edf6"> git add -A</tspan></text>
+<g class="t0"><rect x="40" y="67" width="1200" height="25" fill="#0b0f17"/><rect class="k0" x="40" y="69" width="9.0" height="19" fill="#7aa2ff"/></g>
+<text class="o1" x="58.06" y="109"><tspan fill="#ff6b6b" font-weight="700">✗</tspan><tspan fill="#ffc9c9"> guardrails: stage explicit paths (git add &lt;path&gt; …), never git add -A: other sessions may have changes here.</tspan></text>
+<text x="40" y="134"><tspan fill="#7aa2ff">$</tspan><tspan fill="#e8edf6"> git add src/users.js test/plus.test.mjs</tspan></text>
+<g class="t2"><rect x="40" y="117" width="1200" height="25" fill="#0b0f17"/><rect class="k2" x="40" y="119" width="9.0" height="19" fill="#7aa2ff"/></g>
+<text x="40" y="159"><tspan fill="#7aa2ff">$</tspan><tspan fill="#e8edf6"> git commit -m "Accept any plus tag in the local part (#12)"</tspan></text>
+<g class="t3"><rect x="40" y="142" width="1200" height="25" fill="#0b0f17"/><rect class="k3" x="40" y="144" width="9.0" height="19" fill="#7aa2ff"/></g>
+<text class="o4" x="58.06" y="184"><tspan fill="#3fd27a" font-weight="700">✓</tspan><tspan fill="#8e9ab3"> [12-plus-in-email 4c1e9a2] 2 files changed</tspan></text>
+<text x="40" y="209"><tspan fill="#7aa2ff">$</tspan><tspan fill="#e8edf6"> git push</tspan></text>
+<g class="t5"><rect x="40" y="192" width="1200" height="25" fill="#0b0f17"/><rect class="k5" x="40" y="194" width="9.0" height="19" fill="#7aa2ff"/></g>
+<text class="o6" x="58.06" y="234"><tspan fill="#ff6b6b" font-weight="700">✗</tspan><tspan fill="#ffc9c9"> guardrails: fetch before you push: nothing fetched in the last 15 minutes. Other sessions push here too.</tspan></text>
+<text x="40" y="259"><tspan fill="#7aa2ff">$</tspan><tspan fill="#e8edf6"> git fetch &amp;&amp; git push -u origin 12-plus-in-email</tspan></text>
+<g class="t7"><rect x="40" y="242" width="1200" height="25" fill="#0b0f17"/><rect class="k7" x="40" y="244" width="9.0" height="19" fill="#7aa2ff"/></g>
+<text class="o8" x="58.06" y="284"><tspan fill="#3fd27a" font-weight="700">✓</tspan><tspan fill="#8e9ab3"> branch 12-plus-in-email set up to track origin</tspan></text>
+<text x="40" y="309"><tspan fill="#7aa2ff">$</tspan><tspan fill="#e8edf6"> gh pr create --fill</tspan></text>
+<g class="t9"><rect x="40" y="292" width="1200" height="25" fill="#0b0f17"/><rect class="k9" x="40" y="294" width="9.0" height="19" fill="#7aa2ff"/></g>
+<text class="o10" x="58.06" y="334"><tspan fill="#ff6b6b" font-weight="700">✗</tspan><tspan fill="#ffc9c9"> guardrails: a pull request here needs a body with a 3 am: line (the delivery profile asks for it).</tspan></text>
+</g>
+</svg>

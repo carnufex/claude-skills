@@ -1,0 +1,33 @@
+{
+  "lang": "en",
+  "brand": "**shop** · PR #13",
+  "ref": "Closes #12",
+  "kicker": "Bugfix",
+  "title": "Sign-up accepts a plus sign in the email",
+  "subtitle": "`anna+news@example.com` got a 500. Now the user is created like any other.",
+  "chips": [{ "text": "Review key: PASS", "ok": true }, "2 files"],
+  "scenes": [
+    { "type": "title", "seconds": 3.5 },
+    { "type": "bullets", "seconds": 5, "items": [
+      "The email check allows a `+tag` in the local part, any tag",
+      "An invalid address answers **400**, not 500",
+      "No other validation rule changed"
+    ] },
+    { "type": "flow", "seconds": 6, "mermaid": "flowchart LR\n  A[POST /api/users] --> B{\"Email valid?<br/>name+tag allowed\"}:::changed\n  B -- yes --> C[Store the user] --> D[201 Created]\n  B -- no --> E[400 Bad request]:::added" },
+    { "type": "compare", "seconds": 5, "before": "before.png", "after": "after.png" },
+    { "type": "key", "seconds": 7, "baseFails": true,
+      "rows": [{ "ok": true, "text": "`npm test` · 214 tests" }],
+      "result": {
+        "kind": "spec",
+        "verdict": "PASS",
+        "claim": "`POST /api/users` creates the user for any `+tag` address (201); an invalid address gets 400.",
+        "freeze": { "changed": [], "keyCommit": "3f2a1c9e7b" },
+        "checks": [
+          { "name": "anna+news@example.com", "detail": "201", "ok": true },
+          { "name": "bo+a.b@example.org", "detail": "201", "ok": true },
+          { "name": "not-an-email", "detail": "400", "ok": true }
+        ]
+      } },
+    { "type": "end", "seconds": 3.5, "title": "Ready for review", "lines": ["PR: **github.com/acme/shop/pull/13**", "3 am: the 5xx rate of `POST /api/users`"] }
+  ]
+}
