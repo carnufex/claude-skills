@@ -113,19 +113,19 @@ text { font-family: ${SANS}; }
   <circle class="ring" r="31"/>
   <g class="ico">${icon[kind]}</g>
 </g>
-<text x="${x.toFixed(1)}" y="${Y + 66}" font-size="17" font-weight="700" text-anchor="middle" fill="${C.ink}">${esc(title)}</text>
-<text x="${x.toFixed(1)}" y="${Y + 90}" font-size="13.5" text-anchor="middle" fill="${C.muted}">${esc(sub[0])}</text>
-<text x="${x.toFixed(1)}" y="${Y + 108}" font-size="13.5" text-anchor="middle" fill="${C.muted}">${esc(sub[1])}</text>\n`;
+<text x="${x.toFixed(1)}" y="${Y + 66}" font-size="19" font-weight="700" text-anchor="middle" fill="${C.ink}">${esc(title)}</text>
+<text x="${x.toFixed(1)}" y="${Y + 92}" font-size="15" text-anchor="middle" fill="${C.muted}">${esc(sub[0])}</text>
+<text x="${x.toFixed(1)}" y="${Y + 112}" font-size="15" text-anchor="middle" fill="${C.muted}">${esc(sub[1])}</text>\n`;
     chips.forEach(([text, color, role], k) => {
-      const wch = text.length * 7.6 + 26;
+      const wch = text.length * 8.5 + 28;
       const id = `c${i}${k}`;
       let kf;
       if (role === 'fail') kf = `0%, ${pct(a - 0.6)} { opacity: 0; } ${pct(a + 0.5)}, ${pct(a + HOLD / 2)} { opacity: 1; } ${pct(a + HOLD / 2 + 0.6)}, 100% { opacity: 0; }`;
       else if (role === 'pass') kf = `0%, ${pct(a + HOLD / 2)} { opacity: 0; transform: translateY(6px); } ${pct(a + HOLD / 2 + 0.8)} { opacity: 1; transform: none; } ${pct(END)} { opacity: .9; transform: none; } ${pct(END + 5)}, 100% { opacity: 0; transform: none; }`;
       else kf = `0%${a > 0 ? `, ${pct(a - 0.6)}` : ''} { opacity: 0; transform: translateY(6px); } ${pct(a + 1.2)} { opacity: 1; transform: none; } ${pct(END)} { opacity: .9; transform: none; } ${pct(END + 5)}, 100% { opacity: 0; transform: none; }`;
       css += `@keyframes ${id} { ${kf} }\n.${id} { animation: ${id} ${T}s linear infinite; }\n`;
-      body += `<g class="chip ${role || ''} ${id}"><rect x="${(x - wch / 2).toFixed(1)}" y="${Y - 82}" width="${wch.toFixed(1)}" height="28" rx="14" fill="${C.bg}" stroke="${color}" stroke-opacity=".7"/>
-<text x="${x.toFixed(1)}" y="${Y - 63}" font-size="13" font-weight="700" text-anchor="middle" fill="${color}" font-family="${MONO}">${esc(text)}</text></g>\n`;
+      body += `<g class="chip ${role || ''} ${id}"><rect x="${(x - wch / 2).toFixed(1)}" y="${Y - 84}" width="${wch.toFixed(1)}" height="30" rx="15" fill="${C.bg}" stroke="${color}" stroke-opacity=".7"/>
+<text x="${x.toFixed(1)}" y="${Y - 63.5}" font-size="14.5" font-weight="700" text-anchor="middle" fill="${color}" font-family="${MONO}">${esc(text)}</text></g>\n`;
     });
   });
   // guardrails band, with a scanner that follows the dot
@@ -133,7 +133,7 @@ text { font-family: ${SANS}; }
   body += `<rect x="56" y="${by}" width="${W - 112}" height="40" rx="12" fill="${C.warn}" fill-opacity=".06" stroke="${C.warn}" stroke-opacity=".45" stroke-dasharray="5 5"/>
 <g class="scan"><rect x="${X0 - 50}" y="${by + 1}" width="100" height="38" rx="10" fill="${C.warn}" fill-opacity=".14"/></g>
 <path transform="translate(80 ${by + 20})" d="M0 -11l9 3.5v6c0 6-4 9.5-9 11.5-5-2-9-5.5-9-11.5v-6z" fill="${C.warn}" fill-opacity=".9"/>
-<text x="100" y="${by + 25}" font-size="14.5" fill="${C.ink}"><tspan font-weight="700" fill="${C.warn}">guardrails</tspan>  every git command is checked: explicit staging · fetch before push · frozen review keys · a 3 am line in every PR</text>\n`;
+<text x="100" y="${by + 25.5}" font-size="15.5" fill="${C.ink}"><tspan font-weight="700" fill="${C.warn}">guardrails</tspan>  every git command is checked: explicit staging · fetch before push · frozen review keys · a 3 am line in every PR</text>\n`;
   return frame(W, H, body, css);
 }
 
