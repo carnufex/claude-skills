@@ -1,0 +1,30 @@
+diff --git a/src/users.js b/src/users.js
+--- a/src/users.js
++++ b/src/users.js
+@@ -1,20 +1,22 @@
+ const users = new Map();
+
+-const EMAIL = /^[\w.-]+@[\w-]+(\.[\w-]+)+$/;
++// Local part: letters, digits, dots, underscores and hyphens, with an optional "+test" tag.
++const EMAIL = /^[\w.-]+(\+test)?@[\w-]+(\.[\w-]+)+$/;
+
+ export function validateEmail(email) {
+   if (!EMAIL.test(email)) {
+-    throw new Error(`invalid email: ${email}`);
++    const e = new Error(`invalid email: ${email}`);
++    e.status = 400;
++    throw e;
+   }
+ }
+
+ export async function createUser({ email, name }) {
+   try {
+     validateEmail(email);
+     if (users.has(email)) return { status: 409 };
+     users.set(email, { email, name });
+     return { status: 201, user: users.get(email) };
+   } catch (e) {
+-    return { status: 500, error: e.message };
++    return { status: e.status || 500, error: e.message };
+   }
+ }

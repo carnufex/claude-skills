@@ -1,0 +1,12 @@
+{
+  "name": "guardrails",
+  "description": "The delivery rules that must hold, as hooks instead of instructions: stage explicit paths, fetch before pushing, never change a committed review key without a human's answer, a 3 am line in every PR; and at session start, what waits on a person and which claims went stale.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Christopher Rosenvall",
+    "url": "https://github.com/carnufex"
+  },
+  "repository": "https://github.com/carnufex/claude-skills",
+  "license": "MIT",
+  "keywords": ["hooks", "git", "guardrails", "review-key", "delivery"]
+}

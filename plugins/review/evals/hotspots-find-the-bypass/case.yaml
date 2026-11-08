@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: hotspots-find-the-bypass
+description: A pull request that renames, logs and tidies, and hides a header that skips authentication; the map must lead with it.
+tags: [review, hotspots]
+context:
+  scaffold_script: setup.sh

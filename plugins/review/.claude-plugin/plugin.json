@@ -1,7 +1,7 @@
 {
   "name": "review",
   "description": "Whole-codebase review sweeps that file one verified issue per finding, and pull-request reviews that point a person at the three places worth their ten minutes. Project facts live in .claude/profiles/review.md.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "Christopher Rosenvall",
     "url": "https://github.com/carnufex"

@@ -11,6 +11,7 @@ One skill, many repositories, no copies drifting apart.
 /plugin install review@carnufex
 /plugin install showcase@carnufex
 /plugin install slack-channel@carnufex
+/plugin install guardrails@carnufex
 ```
 
 A repository can pin the plugins it uses in its own `.claude/settings.json`, so every session there gets them:
@@ -31,6 +32,7 @@ A repository can pin the plugins it uses in its own `.claude/settings.json`, so 
 | **delivery** | `new-issue` · `review-key` (the frozen check that says done: parity, shadow, bit-exact, spec, eval; `keycheck.mjs` runs it) · `work-issue` (claim with the bundled race-safe `claim.mjs`, key first, build until the key passes, then the `key-reviewer` agent) · `plan-milestone` · `decision` (needs-human questions, ADRs) · `ship` (verify → PR → merge → GitOps deploy → live check → rollback) | `.claude/profiles/delivery.md` |
 | **showcase** | `pr-demo` (a 30–60 s video of a PR — what changed, the animated flow, before/after, the recorded run, the review key's verdict — posted with the link to Slack) | `.claude/profiles/delivery.md` (*Demo*, *Notify*) |
 | **slack-channel** | `slack-channel-setup` — a Claude Code channel: chat in Slack (DM or channel) with the session on your own computer over Socket Mode; replies in threads, uploads, tool approvals as Allow/Deny buttons | `~/.claude/channels/slack/` (tokens, allowlist) |
+| **guardrails** | hooks, no skills: refuses `git add -A`, a push without a recent fetch, a commit that changes a committed review key, a PR without a `3 am:` line; at session start lists what waits on a person and stale claims | `.claude/profiles/delivery.md` (where it applies) |
 | **review** | `review-sweep` (whole codebase or one area → verified findings → one GitHub issue each) · `review-hotspots` (one PR → a "look here first" map of at most three entries, then at most five findings) | `.claude/profiles/review.md` |
 | **gitops** | `gitops-app-onboarding` (new app in an ArgoCD ApplicationSet cluster: whitelists, secrets, storage, routes, the 3 am alert) | `.claude/profiles/gitops.md` |
 
@@ -69,6 +71,22 @@ orchestrating session owns correctness and re-verifies every high-severity findi
 2. Bump the plugin's `version` in **both** `plugins/<plugin>/.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json`.
 3. Mention every skill in this README and in the plugin's README.
 4. Run `tools/validate.sh` before pushing; CI runs the same checks on every push and pull request.
+
+## Evals
+
+Validation proves a skill is well formed; evals prove it still works. Each plugin with skills worth measuring has an
+`evals/` suite for `claude plugin eval`: realistic prompts, graders on the result (a file, the final answer, a judge's
+rubric) and on the process (the skill or agent was used), each case run with and without the plugin so the report shows
+what the plugin adds (`Δ`).
+
+```bash
+tools/eval.sh                  # every suite, 3 runs per case, with the no-plugin baseline
+QUICK=1 tools/eval.sh review   # one run per case, no baseline, while changing a skill
+```
+
+Cases only grant read and write tools, so they run on Windows too (shell-granting cases need the sandbox, which native
+Windows lacks). Runs use your Claude login; the `evals` CI job runs only by hand and only when the repository has an
+`ANTHROPIC_API_KEY` secret. Change a skill → run its suite before pushing, and say the scores in the commit.
 
 ## Validation
 

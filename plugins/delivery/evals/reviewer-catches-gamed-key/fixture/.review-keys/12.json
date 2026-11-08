@@ -1,0 +1,7 @@
+{
+  "issue": 12,
+  "kind": "spec",
+  "claim": "POST /api/users with an email containing a plus sign creates the user (201); an invalid address gets 400.",
+  "oracle": ["test/plus.test.mjs"],
+  "checks": [{ "name": "plus sign in the email", "run": "node test/plus.test.mjs" }]
+}

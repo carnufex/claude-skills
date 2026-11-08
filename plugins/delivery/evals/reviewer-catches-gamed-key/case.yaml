@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: reviewer-catches-gamed-key
+description: The implementation passes the frozen key without fixing the bug (it accepts only "+test"); an independent review must not pass it.
+tags: [delivery, review-key, key-reviewer]
+context:
+  scaffold_script: setup.sh

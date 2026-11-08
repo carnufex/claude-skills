@@ -10,7 +10,7 @@
     {
       "name": "delivery",
       "description": "From issue to verified production: ready issues with a review key, race-safe claims, an implementer/reviewer loop that an independent key-reviewer agent must pass, milestone planning, needs-human decisions recorded as ADRs, and shipping through GitOps with a live check and rollback by revert.",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "source": "./plugins/delivery",
       "category": "development",
       "keywords": [
@@ -29,7 +29,7 @@
     {
       "name": "review",
       "description": "Whole-codebase review sweeps that file one verified issue per finding, and pull-request reviews that point a person at the three places worth their ten minutes.",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "source": "./plugins/review",
       "category": "development",
       "keywords": [
@@ -82,6 +82,20 @@
         "remote",
         "mcp",
         "socket-mode"
+      ]
+    },
+    {
+      "name": "guardrails",
+      "description": "Delivery rules as hooks: explicit staging, fetch before push, frozen review keys, a 3 am line in every PR; and at session start, what waits on a person and which claims went stale.",
+      "version": "1.0.0",
+      "source": "./plugins/guardrails",
+      "category": "development",
+      "keywords": [
+        "hooks",
+        "git",
+        "guardrails",
+        "review-key",
+        "delivery"
       ]
     }
   ]
