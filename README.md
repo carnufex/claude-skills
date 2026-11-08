@@ -66,25 +66,29 @@ The `delivery` plugin is one path, the same in every repository. The session doe
 what is theirs to decide, and reviews a video and a short map instead of the whole diff.
 
 ```mermaid
-flowchart TD
-  idea([An idea or a bug]) --> NI["new-issue<br/>criteria, labels, milestone"]
-  PM["plan-milestone<br/>goal → ordered issues"] -.-> NI
-  NI --> RK["review-key<br/>the check that says done"]
-  RK --> ready{{"ready issue<br/>with a review key"}}
-  ready --> WI["work-issue<br/>claim · worktree · key committed first"]
-  WI --> build["build"]
-  build --> KC{"keycheck<br/>passes?"}
-  KC -- no --> build
-  KC -- yes --> KR["key-reviewer agent<br/>independent, read-only"]
-  KR -- "FAIL / KEY-WEAK" --> build
-  KR -- PASS --> SH["ship: PR<br/>Closes #n · verdict · 3 am line"]
-  SH --> DEMO["pr-demo<br/>video + flowchart"] --> THREAD["Slack thread for the PR"]
-  SH --> MERGE["merge"] --> DEPLOY["GitOps deploy"] --> LIVE{"live check"}
-  LIVE -- ok --> DONE([done, reported in the thread])
-  LIVE -- broken --> RB["revert and redeploy"]
-  WI -. "not mine to decide" .-> DEC["decision<br/>needs-human question"]
-  DEC -. "answer → ADR" .-> WI
-  RK -. "a wrong key" .-> DEC
+flowchart TB
+  subgraph P["1 · Plan: a ready issue"]
+    direction LR
+    idea([An idea or a bug]) --> NI["new-issue<br/>criteria, milestone"] --> RK["review-key<br/>the check that says done"]
+    PM["plan-milestone<br/>goal → issues"] -.-> NI
+  end
+  subgraph W["2 · Work: until an independent PASS"]
+    direction LR
+    WI["work-issue<br/>claim, key first"] --> build["build"] --> KC{"keycheck<br/>passes?"}
+    KC -- no --> build
+    KC -- yes --> KR["key-reviewer<br/>agent"]
+    KR -- "FAIL or<br/>KEY-WEAK" --> build
+    WI -. "not mine<br/>to decide" .-> DEC["decision<br/>needs-human"]
+  end
+  subgraph S["3 · Ship: verified live"]
+    direction LR
+    SH["PR<br/>verdict, 3 am line"] --> MERGE["merge"] --> DEPLOY["GitOps<br/>deploy"] --> LIVE{"live<br/>check"}
+    LIVE -- ok --> DONE([done])
+    LIVE -- broken --> RB["revert"]
+    SH --> DEMO["pr-demo<br/>video"] --> THREAD["Slack thread"]
+  end
+  P == "ready issue" ==> W
+  W == "PASS" ==> S
 
   classDef human fill:#f2b84b,stroke:#b07d1a,color:#1a1205
   classDef key fill:#7aa2ff,stroke:#3d5fb8,color:#0b0f17
@@ -93,6 +97,9 @@ flowchart TD
   class RK,KC,KR key
   class DONE ok
 ```
+
+Yellow is where a person comes in: a question only they can answer (answered questions become ADRs, and a wrong key
+is one of them), and the PR's Slack thread. Blue is the review key.
 
 ## Review keys
 
