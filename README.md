@@ -29,23 +29,21 @@ change, to talk to the session on my own computer from Slack, and to put an app 
 ## How it fits together
 
 ```mermaid
-flowchart TB
-  subgraph M["this repository: the method"]
-    direction LR
-    delivery ~~~ review ~~~ showcase ~~~ guardrails ~~~ slack["slack-channel"] ~~~ gitops
-  end
-  subgraph R["each repository: the facts"]
-    direction LR
-    settings["settings.json<br/>which plugins"] ~~~ profile["profiles/*.md<br/>labels, verify, deploy"] ~~~ keys[".review-keys/<br/>frozen done-checks"]
-  end
-  subgraph C["each computer"]
-    direction LR
-    installs["installed plugins<br/>update-local.mjs"] --> session(["Claude Code session"])
-  end
-  M == "install, update" ==> installs
-  R == "read at work" ==> session
-  session -- "issues, PRs" --> GH[(GitHub)]
-  session <-- "demos, threads, chat" --> SL[(Slack)]
+flowchart LR
+  M["THIS REPOSITORY<br/>the method<br/>delivery · review<br/>showcase · guardrails<br/>slack-channel · gitops"]
+  R["EACH REPOSITORY<br/>the facts<br/>settings.json<br/>profiles/*.md<br/>.review-keys/"]
+  I["EACH COMPUTER<br/>installed plugins<br/>tools/update-local.mjs"]
+  S(["Claude Code session"])
+  M -- "install, update" --> I --> S
+  R -- "read at work" --> S
+  S -- "issues, PRs" --> GH[(GitHub)]
+  S <-- "demos, threads, chat" --> SL[(Slack)]
+  classDef method fill:#7aa2ff,stroke:#3d5fb8,color:#0b0f17
+  classDef facts fill:#f2b84b,stroke:#b07d1a,color:#1a1205
+  classDef run fill:#3fd27a,stroke:#1f8a4c,color:#08110c
+  class M method
+  class R facts
+  class S run
 ```
 
 | Plugin | What it gives a session | Profile |
