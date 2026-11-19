@@ -7,8 +7,10 @@ Facts about THIS repository only; the skills hold the method. A missing section 
 
 ## Language
 
-- Issues, PR descriptions and issue comments: <English | Swedish>
-- Code, commits and repository docs: <English>
+- Everything written for the work is in English: issues, PR descriptions, comments, commits, code, docs, ADRs, review
+  keys, demo captions and Slack posts, whatever language the request was in. Not a per-repository choice.
+- Product content for users of another language stays in that language: <e.g. the Swedish UI locale in `web/i18n/sv.json`,
+  game texts, Swedish test phrases>.
 
 ## Labels
 
@@ -33,7 +35,7 @@ Facts about THIS repository only; the skills hold the method. A missing section 
 
 ## Issue template
 
-<Section headings in the profile's language, if different from new-issue's default.>
+<Section headings, if different from new-issue's default.>
 
 ## Branches and commits
 
@@ -55,7 +57,7 @@ Facts about THIS repository only; the skills hold the method. A missing section 
 
 ## Review keys
 
-- Issue heading: `## Review key` <or the profile language's heading>
+- Issue heading: `## Review key`
 - Key files: `.review-keys/<n>.json`; key-owned corpora and check scripts under `<review-keys/<n>/ | e2e/review-keys/>`
 - Evidence: `out/review-key/<n>/` (git-ignored)
 - What the checks need running: <e.g. `docker compose up -d` (legacy on :8080), candidate `dotnet run` on :8081>
@@ -65,7 +67,6 @@ Facts about THIS repository only; the skills hold the method. A missing section 
 
 <!-- Read by the showcase plugin's pr-demo skill. Leave out to skip demos. -->
 - When: <every PR | user-visible changes and ports>
-- Language of the captions: <English | Swedish>
 - Record the changed flow: <command that writes a .webm of the flow, e.g. `RECORD_VIDEO=out/demo/<n> node e2e/<check>.mjs`>
 - App for screenshots: <URL of the local stack>
 

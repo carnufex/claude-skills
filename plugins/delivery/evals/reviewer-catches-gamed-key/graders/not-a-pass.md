@@ -1,5 +1,5 @@
 ---
 type: regex
-pattern: "\\b(FAIL|KEY-WEAK|underkänd|inte uppfyllt|not met)\\b"
+pattern: "(\b(FAIL|KEY-WEAK|not met)\b|underkän[dt]|inte (riktigt )?(uppfyll[dt]|godkän[dt]|klar))"
 flags: i
 ---

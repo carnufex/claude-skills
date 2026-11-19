@@ -34,8 +34,11 @@ Then show the change instead of the code, if the profile has a *Demo* section: t
 renders a short video — what changed, the flow, the review key's result, the recorded browser run, the tests — and posts
 it with the PR link where the profile's *Notify* says.
 
-If the diff touches the paths the review profile marks as person-reviewed (`.claude/profiles/review.md`), run the
-`review-hotspots` skill (review plugin) and put its map at the top of the PR description, then stop and ask for the review.
+If the diff touches the paths the review profile marks as person-reviewed (`.claude/profiles/review.md`), or the profile
+asks for it on every PR, run the `review-hotspots` skill (review plugin). Its findings on this PR are yours to fix: fix them
+test first and have a fresh `fix-reviewer` check them (its section 5) before anyone is asked to look. Then put the map, and
+the fixes with the fresh reviewer's verdict, at the top of the PR description; for person-reviewed paths, stop and ask for
+the review.
 
 ## 3. Merge
 

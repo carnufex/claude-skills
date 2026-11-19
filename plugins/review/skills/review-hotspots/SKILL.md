@@ -1,6 +1,6 @@
 ---
 name: review-hotspots
-description: Review one pull request or diff so a person's attention lands on the few changes that can hurt production — a ranked "Human review, look here first" map (at most three entries, each with where, why it is dangerous in this diff, what to verify by hand in a minute, and a verdict), then at most five blocker or should-fix findings, no polish. Asks the 3 am question of every hotspot. Use for every pull-request review, before asking a person to approve a PR that touches person-reviewed paths, or when asked where the dangerous parts of a diff are. Not for whole-codebase audits (use review-sweep).
+description: Review one pull request or diff so a person's attention lands on the few changes that can hurt production — a ranked "Human review, look here first" map (at most three entries, each with where, why it is dangerous in this diff, what to verify by hand in a minute, and a verdict), then at most five blocker or should-fix findings, no polish. Asks the 3 am question of every hotspot. On the session's own PR it then fixes its findings itself, test first, and has a fresh fix-reviewer agent check the fixes. Use for every pull-request review, before asking a person to approve a PR that touches person-reviewed paths, or when asked where the dangerous parts of a diff are. Not for whole-codebase audits (use review-sweep).
 effort: high
 ---
 
@@ -92,6 +92,26 @@ makes them reachable).
 <"Required: touches <person-reviewed path>" | "Not required by the profile">
 ```
 
-Return it as text. Post it only when asked or when the profile requires it: when a person must review (the diff touches the
-profile's *Person-reviewed paths*), put the map at the top of the PR description (`gh pr edit <n> --body-file …`, keeping the
-author's text below) so the reviewer sees it first. Never approve or merge a PR yourself because the map says `looks right`.
+Write it in English, whatever language the request was in. Return it as text. Post it only when asked or when the profile
+requires it: when a person must review (the diff touches the profile's *Person-reviewed paths*), put the map at the top of
+the PR description (`gh pr edit <n> --body-file …`, keeping the author's text below) so the reviewer sees it first. Never
+approve or merge a PR yourself because the map says `looks right`.
+
+## 5. Fix your own findings, then a fresh reviewer
+
+On the session's own work (a branch it pushed, a PR `ship` opened) or when asked to fix, the reviewer fixes its own
+findings: it holds the scenario and the evidence, so nothing is lost in a handoff. It never judges its own fixes; a fresh
+agent that did not write them does. On someone else's PR, never push: post the findings as a review comment instead.
+
+1. **Only the findings.** Each `blocker` and `should-fix`, nothing else: no refactor, no polish, no feature. A finding whose
+   fix needs a design choice goes to a person (the delivery plugin's `decision`) instead of a fix.
+2. **Show it, then fix it.** Per finding: first a test (or a command) that reproduces the scenario and fails, then the
+   smallest fix, then the test passes. One commit per finding, test and fix together: `Review fix: <finding title>`. Stage
+   explicit paths; `git fetch` before the push.
+3. **A fresh reviewer.** Spawn the `fix-reviewer` agent with only the repository path, the branch, the base, the commit
+   range of the fixes and the findings as written in section 3 (where, what, the scenario). Never your reasoning, how you
+   fixed them or "it should pass". It answers per finding `CLOSED` or `OPEN` and lists anything new the fixes introduced.
+4. **Rounds.** Fix what is `OPEN` or new, then spawn a **new** `fix-reviewer` (never continue the last one: it would
+   remember its verdict). At most three rounds; then stop and put the open findings in the PR description for a person.
+5. **Record it.** Under the map in the PR description: each finding, its fix commit and the fresh reviewer's verdict. Fixed
+   findings never replace the person review the profile requires for person-reviewed paths.

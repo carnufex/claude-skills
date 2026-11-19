@@ -27,6 +27,7 @@ function main(input) {
     const human = JSON.parse(run('gh', ['issue', 'list', '--label', 'needs-human', '--state', 'open', '--limit', '20', '--json', 'number,title,updatedAt,comments'], top));
     for (const i of human) {
       const last = i.comments?.at(-1);
+      // Older issues carry the needs-human heading in Swedish; new ones are English.
       const answered = last && !/needs-human|What is needed from you|Vad behövs från dig/i.test(last.body || '') && last.author?.login !== 'github-actions';
       lines.push(`- #${i.number} ${i.title}${answered ? ' — has a newer comment, possibly the answer' : ''}`);
     }

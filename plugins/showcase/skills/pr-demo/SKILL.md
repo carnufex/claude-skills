@@ -6,7 +6,7 @@ description: Show a pull request instead of its code — render a 25–40 second
 # PR demo
 
 A reviewer should understand a change in well under a minute without opening the diff: what changed, how it works now,
-proof that it works, and where to look. Repository facts — caption language, how to record the changed flow, where to
+proof that it works, and where to look. Captions and posts are in English. Repository facts — how to record the changed flow, where to
 post — are in `.claude/profiles/delivery.md` (*Demo*, *Notify*).
 
 **Short and blunt beats complete.** Five scenes in 30 seconds, in this order, and leave out what the change does not
@@ -37,12 +37,11 @@ Into `out/demo/<pr or issue>/` (git-ignored):
 
 ## 2. Write `demo.json`
 
-Next to the material (paths are relative to it). Text in the profile's caption language; short — a scene is read in its
-seconds. Backticks and `**bold**` work.
+Next to the material (paths are relative to it). Text in English, whatever language the request was in; short — a
+scene is read in its seconds. Backticks and `**bold**` work.
 
 ```json
 {
-  "lang": "en",
   "brand": "**shop** · PR #352",
   "ref": "Closes #331",
   "kicker": "Bugfix",

@@ -1,0 +1,63 @@
+commit 7c1d2e0 Review fix: no debug sign-in in production (F1)
+diff --git a/src/http/auth.ts b/src/http/auth.ts
+--- a/src/http/auth.ts
++++ b/src/http/auth.ts
+@@ -9,7 +9,7 @@ export async function authenticate(req, res, next) {
+   if (req.path === '/api/health') return next();
+-  if (req.headers['x-debug-user']) {
++  if (process.env.NODE_ENV !== 'production' && req.headers['x-debug-user']) {
+     req.user = { id: req.headers['x-debug-user'], roles: ['admin'] };
+     return next();
+   }
+diff --git a/test/auth.test.ts b/test/auth.test.ts
+new file mode 100644
+--- /dev/null
++++ b/test/auth.test.ts
+@@ -0,0 +1,14 @@
++import request from 'supertest';
++import { app } from '../src/app';
++
++describe('x-debug-user', () => {
++  beforeAll(() => { process.env.NODE_ENV = 'production'; });
++
++  it('does not sign anyone in', async () => {
++    const res = await request(app).get('/api/users').set('x-debug-user', '1');
++    expect(res.status).toBe(401);
++  });
++});
+
+commit 9a4f5b1 Review fix: only well-formed request ids reach the log (F2)
+diff --git a/src/http/logger.ts b/src/http/logger.ts
+--- a/src/http/logger.ts
++++ b/src/http/logger.ts
+@@ -3,8 +3,10 @@ import pino from 'pino';
+ export const log = pino({ level: process.env.LOG_LEVEL ?? 'info' });
+
++const REQUEST_ID = /^[A-Za-z0-9-]{1,64}$/;
++
+ export function requestLog(req, res, next) {
+-  const requestId = req.headers['x-request-id'] ?? crypto.randomUUID();
++  const given = req.headers['x-request-id'];
++  const requestId = typeof given === 'string' && REQUEST_ID.test(given) ? given : crypto.randomUUID();
+   res.setHeader('x-request-id', requestId);
+   log.info({ path: req.path, requestId }, 'request');
+   next();
+diff --git a/test/logger.test.ts b/test/logger.test.ts
+new file mode 100644
+--- /dev/null
++++ b/test/logger.test.ts
+@@ -0,0 +1,16 @@
++import request from 'supertest';
++import { app } from '../src/app';
++
++describe('x-request-id', () => {
++  it('replaces an id with a newline', async () => {
++    const res = await request(app).get('/api/health').set('x-request-id', 'a\nlevel=error');
++    expect(res.headers['x-request-id']).toMatch(/^[0-9a-f-]{36}$/);
++  });
++
++  it('keeps a well-formed id', async () => {
++    const res = await request(app).get('/api/health').set('x-request-id', 'abc-123');
++    expect(res.headers['x-request-id']).toBe('abc-123');
++  });
++});

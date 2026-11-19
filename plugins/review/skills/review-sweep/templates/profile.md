@@ -42,7 +42,7 @@ a missing section means "use the skill's defaults".
 
 - Labels: `type:<bug|chore|feature>`, `area:<...>`, `severity:<high|medium|low>`, `review-sweep`
 - Areas for the `area:` label: <list>
-- Language and style rules for issue text: <e.g. "no issue numbers in user-visible strings">
+- Style rules for issue text (always in English): <e.g. "no issue numbers in user-visible strings">
 
 ## Hotspots
 

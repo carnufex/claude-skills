@@ -8,6 +8,9 @@
 //   3. A committed review key is frozen: a commit that changes `.review-keys/<n>.json` or one of its oracle paths, once
 //      that key is in HEAD, is refused unless the command carries REVIEW_KEY_CHANGE=<n> (a human answered on the issue).
 //   4. A pull request in a repository with a delivery profile carries a `3 am:` line in its body.
+//   5. The work is written in English: a commit message, PR or issue text (title, body, comment) that reads as Swedish is
+//      refused, whatever language the request was in. Text in quotes or code spans is product content and not judged.
+//      GUARDRAILS_LANGUAGE=any (in the environment Claude Code runs in) turns this off.
 //
 // Input: the hook JSON on stdin. Output: nothing (no decision) or a deny decision as JSON. Fails open: any error in
 // this script lets the command through, so a broken guard never blocks work.
@@ -17,6 +20,48 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const FETCH_MINUTES = Number(process.env.GUARDRAILS_FETCH_MINUTES || 15);
+const LANGUAGE = String(process.env.GUARDRAILS_LANGUAGE || 'en').toLowerCase();
+
+// Swedish function words that do not double as English words, for telling a Swedish text from an English one.
+const SV_WORDS = new Set(('och att inte är för på från också när eller utan bara varför måste finns blir eftersom detta denna '
+  + 'dessa här där vad hur ska jag har kan med som det efter ett vi får gör görs nya inga inget ingen alla vill kommer').split(' '));
+
+/** True when a text reads as Swedish. Quoted text, code spans, paths and ids are left out: they are content, not prose. */
+export function swedish(text) {
+  const plain = String(text || '')
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/`[^`\n]*`/g, ' ')
+    .replace(/"[^"\n]*"|“[^”\n]*”|«[^»\n]*»/g, ' ')
+    .replace(/(^|\s)'[^'\n]*'(?=[\s.,;:!?)]|$)/g, ' ')
+    .replace(/\S*(?:[/\\_@#]|\.\w)\S*/g, ' ');
+  const words = plain.toLowerCase().match(/[a-zåäöéü]+/g) || [];
+  if (words.length < 4) return false;
+  const distinct = new Set(words);
+  const marked = [...distinct].filter((w) => SV_WORDS.has(w) || /[åäö]/.test(w));
+  return marked.length >= 3 && marked.length / distinct.size >= 0.15;
+}
+
+const ENGLISH = 'write commit messages, pull requests and issues in English, whatever language the request was in: English is '
+  + 'the working language here. Swedish product text (a UI string, a test phrase) goes in quotes or a code span.';
+
+/** The text arguments of a command: values of `flags`, and the contents of the files named by `fileFlags`. */
+function textArgs(args, cwd, flags, fileFlags, docs = []) {
+  const out = [];
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    const eq = a.match(/^(--[a-z-]+)=([\s\S]*)$/);
+    const flag = eq ? eq[1] : a;
+    const value = eq ? eq[2] : args[i + 1];
+    const cluster = /^-[a-zA-Z]*m$/.test(a) && a.length > 2 && flags.includes('-m'); // git commit -qm "…"
+    if (flags.includes(flag) || cluster) { if (value === '') out.push(...docs); else if (value != null) out.push(value); if (!eq) i++; }
+    else if (fileFlags.includes(flag)) {
+      if (value === '-') out.push(...docs);
+      else if (value) { try { out.push(fs.readFileSync(path.resolve(cwd, value), 'utf8')); } catch { /* not readable: not judged */ } }
+      if (!eq) i++;
+    } else if (/^-m./.test(a) && flags.includes('-m')) out.push(a.slice(2));
+  }
+  return out;
+}
 
 function deny(reason) {
   process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PreToolUse', permissionDecision: 'deny', permissionDecisionReason: `guardrails: ${reason}` } }));
@@ -80,13 +125,20 @@ export function check(input) {
   if (!/\bgit\b|\bgh\b/.test(cmd)) return null;
   let cwd = input.cwd || process.cwd();
   const list = commands(cmd);
+  // Heredoc and here-string bodies: the message of `git commit -F -`, `gh … --body-file -` or `-m @'…'@`.
+  const docs = [...cmd.matchAll(/<<-?\s*(['"]?)([A-Za-z_][\w]*)\1[^\n]*\n([\s\S]*?)\n[ \t]*\2[ \t]*(?=\n|$)/g)].map((m) => m[3])
+    .concat([...cmd.matchAll(/@(['"])\r?\n([\s\S]*?)\r?\n\1@/g)].map((m) => m[2]));
+  const english = (texts) => LANGUAGE !== 'en' || !texts.some(swedish);
   let fetched = false;
   for (const words of list) {
     if (words[0] === 'cd' || /^(Set-Location|sl|pushd)$/i.test(words[0])) { if (words[1]) cwd = path.resolve(cwd, words[1]); continue; }
 
-    if (/^gh(\.exe)?$/i.test(words[0]) && words[1] === 'pr' && words[2] === 'create') {
-      const r = prBody(words, cwd);
-      if (r) return r;
+    if (/^gh(\.exe)?$/i.test(words[0]) && /^(pr|issue)$/.test(words[1]) && /^(create|edit|comment|review)$/.test(words[2])) {
+      if (!english(textArgs(words.slice(3), cwd, ['--title', '-t', '--body', '-b'], ['--body-file', '-F'], docs))) return ENGLISH;
+      if (words[1] === 'pr' && words[2] === 'create') {
+        const r = prBody(words, cwd);
+        if (r) return r;
+      }
       continue;
     }
 
@@ -108,6 +160,7 @@ export function check(input) {
       }
     }
     if (g.sub === 'commit') {
+      if (!english(textArgs(g.args, cwd, ['-m', '--message'], ['-F', '--file'], docs))) return ENGLISH;
       const r = frozenKey(g.dir, { ...g.env, ...envPrefix(cmd) });
       if (r) return r;
     }

@@ -35,6 +35,6 @@ The path from an idea to verified production, the same in every repository, with
 
 ## Profile
 
-`.claude/profiles/delivery.md`, from `skills/new-issue/templates/profile.md`: *Language*, *Labels*, *Status and claims*,
+`.claude/profiles/delivery.md`, from `skills/new-issue/templates/profile.md`: *Language* (always English, plus which product content is not), *Labels*, *Status and claims*,
 *Milestones*, *Issue template*, *Branches and commits*, *Tests policy*, *Verify*, *Review keys*, *Demo*, *Notify*, *Merge*, *Deploy*, *Live*, *Rollback*,
 *When it breaks* and *Decisions*.

@@ -9,7 +9,13 @@ Two reviews for two jobs.
 - **review-hotspots**: one pull request or diff. A "Human review: look here first" map of at most three entries (where, why it
   is dangerous in *this* diff, what to verify by hand in a minute, verdict), ranked by hotspot, then at most five blocker or
   should-fix findings. No polish. Checks the linked issue's acceptance criteria and asks the 3 am question of every hotspot.
-  When the diff touches the profile's person-reviewed paths, the map goes at the top of the PR description.
+  When the diff touches the profile's person-reviewed paths, the map goes at the top of the PR description. On the session's
+  own PR it then fixes its findings itself (a failing test first, one commit per finding) and spawns a fresh `fix-reviewer`.
+- **fix-reviewer** (agent, sonnet, read-only tools): the independent half of that loop. Given only the branch, the fix commits
+  and the findings, it reproduces each scenario on the branch and before the fixes, reads the fixes for tailored tests and
+  new problems, runs the tests, and answers `CLOSED` or `OPEN` per finding. A new one every round, at most three rounds.
+
+Everything the plugin writes (maps, findings, issues, fix commits) is in English, whatever language the request was in.
 
 ## Install
 

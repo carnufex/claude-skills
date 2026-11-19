@@ -5,7 +5,7 @@ description: Create a well-formed GitHub issue that someone (or another session)
 
 # New issue
 
-Repository facts — language of issue text, labels, milestones, the issue template, what "ready" means — are in
+Repository facts — labels, milestones, the issue template, what "ready" means — are in
 `.claude/profiles/delivery.md`.
 
 ## Profile missing?
@@ -22,7 +22,7 @@ Write only what you found; leave a section out rather than invent a rule. Tell t
 2. **Classify** with the profile's *Labels*: one type, one area, and the milestone or plan the profile's *Milestones*
    points at (ask `plan-milestone` if none fits and the work is larger than one issue). A bug gets steps to reproduce,
    expected and actual behaviour.
-3. **Write** in the profile's language, with the profile's *Issue template* sections. Without one:
+3. **Write** in English (whatever language the request was in), with the profile's *Issue template* sections. Without one:
    - **Background** — why this matters, what exists today (with `path:line` or links).
    - **Goal** — the outcome, from the outside.
    - **Acceptance criteria** — checkboxes, each one observable or testable. "Works well" is not a criterion.

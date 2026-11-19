@@ -5,7 +5,7 @@ description: Handle work that needs a human decision without stalling — ask it
 
 # Decisions
 
-Repository facts — label names, ADR folder and template, numbering, language — are in `.claude/profiles/delivery.md`
+Repository facts — label names, ADR folder and template, numbering — are in `.claude/profiles/delivery.md`
 (*Decisions*). Missing profile: create it as `new-issue` describes.
 
 ## Is it really a human decision?
@@ -18,7 +18,7 @@ repository, a related repository or the docs is answered, not asked.
 ## Ask
 
 1. On the issue the work belongs to (or a new one via `new-issue`, type decision), add the profile's `needs-human` label
-   (plus the decision label when it is architectural) and a section, in the profile's language, headed as the profile says
+   (plus the decision label when it is architectural) and a section, in English, headed as the profile says
    (default `## What is needed from you`):
    - **Question**: one concrete question.
    - **Context**: what you found, with `path:line` and links; what is blocked until it is decided.

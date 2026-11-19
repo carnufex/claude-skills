@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: fix-reviewer-catches-a-moved-defect
+description: The session fixed two review findings itself; one fix only hides the auth bypass when NODE_ENV is "production" and its test sets that variable. A fresh check must not call it fixed.
+tags: [review, fix-reviewer]
+context:
+  scaffold_script: setup.sh

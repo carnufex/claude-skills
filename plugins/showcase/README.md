@@ -19,5 +19,5 @@ Needs ffmpeg on PATH; Playwright comes from the project or is installed once int
 
 ## Profile
 
-Reads the *Demo* and *Notify* sections of `.claude/profiles/delivery.md` (template in the delivery plugin): caption
-language, the command that records the changed flow, and the Slack channel to post in.
+Reads the *Demo* and *Notify* sections of `.claude/profiles/delivery.md` (template in the delivery plugin): the command
+that records the changed flow, and the Slack channel to post in. Captions and posts are in English.

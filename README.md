@@ -52,7 +52,7 @@ flowchart LR
 | **showcase** | `pr-demo`: a 30-second video of a PR (what changed, the animated flow, before and after, the recorded run, the review key's verdict) posted with the link to Slack | `delivery.md` (*Demo*, *Notify*) |
 | **guardrails** | hooks, no skills: refuses `git add -A`, a push without a recent fetch, a commit that changes a committed review key, a PR without a `3 am:` line; at session start lists what waits on a person and stale claims | `delivery.md` (where it applies) |
 | **slack-channel** | `slack-channel-setup`: chat in Slack (DM or a channel per repository) with the session on your own computer over Socket Mode; replies in threads, uploads, tool approvals as Allow/Deny buttons | `~/.claude/channels/slack/` |
-| **review** | `review-sweep` (a codebase or area → verified findings → one issue each) · `review-hotspots` (one PR → a "look here first" map of at most three entries, then at most five findings) | `.claude/profiles/review.md` |
+| **review** | `review-sweep` (a codebase or area → verified findings → one issue each) · `review-hotspots` (one PR → a "look here first" map of at most three entries, then at most five findings; on the session's own PR it fixes them, test first) · `fix-reviewer` agent (a fresh check of those fixes) | `.claude/profiles/review.md` |
 | **gitops** | `gitops-app-onboarding`: a new app in an ArgoCD ApplicationSet cluster: whitelists, secrets, storage, routes, the 3 am alert | `.claude/profiles/gitops.md` |
 
 This repository is public: nothing here may name a host, an address, a secret or a private repository's internals. Those
@@ -243,6 +243,7 @@ commands) and checked before it runs. A refusal names the right way; any error i
 | Fetch before you push | `git push` with nothing fetched in 15 minutes; a force push to `main` | `git fetch && git push`; `--force-with-lease` on a branch |
 | A committed review key is frozen | a commit that changes `.review-keys/<n>.json` or its oracle | the key commit; a human-approved change with `REVIEW_KEY_CHANGE=<n>` |
 | A `3 am:` line in every PR | `gh pr create` without one, where a delivery profile exists | `3 am: <signal>`, or `3 am: n/a (<why>)` |
+| The work is in English | a commit message, PR or issue text (title, body, comment) written in Swedish | English prose; Swedish product text in quotes or code spans |
 
 At session start, in a repository with a delivery profile, the session also learns which `needs-human` questions are
 open (and which may have been answered) and which claims have been untouched for 7 days.
@@ -297,9 +298,13 @@ plugin adds.
 
 | Case | What must happen | With | Without | Δ |
 |---|---|---|---|---|
-| `delivery/issue-gets-review-key` | a bug report becomes an issue whose key decides alone and fails today | `██████████` 1.00 | `██▌·······` 0.25 | **+0.75** |
-| `delivery/reviewer-catches-gamed-key` | the fix only accepts `+test`; the independent review must not pass it | `█████████·` 0.89 | `██████▋···` 0.67 | **+0.22** |
+| `delivery/issue-gets-review-key` | a Swedish bug report becomes an English issue whose key decides alone and fails today | `██████████` 1.00 | `██········` 0.20 | **+0.80** |
+| `delivery/reviewer-catches-gamed-key` | the fix only accepts `+test`; the independent review must not pass it | `██████████` 1.00 | `███████▊··` 0.78 | **+0.22** |
 | `review/hotspots-find-the-bypass` | a tidy-up PR hides an auth bypass header; the map leads with it | `██████████` 1.00 | `██████····` 0.60 | **+0.40** |
+| `review/fix-reviewer-catches-a-moved-defect` | a fix only hides the bypass when `NODE_ENV` is set; a fresh `fix-reviewer` must call it open | `██████████` 1.00 | `██████████` 1.00 | 0.00 |
+
+The last case shows the process, not the outcome: Claude without the plugin also spots the moved defect, but only with the
+plugin is it a fresh agent that judges the fixes (`fix-reviewer` used in 3 of 3 runs).
 
 ```bash
 tools/eval.sh                  # every suite, 3 runs per case, with the no-plugin baseline
@@ -312,8 +317,14 @@ native Windows lacks). Runs use your Claude login; the `evals` CI job runs only 
 
 ## Principles the skills share
 
+- **English, always.** The agent works, writes and thinks in English: code, comments, docs, skills, issues, PRs, commits,
+  review keys, ADRs, demo captions and Slack posts, whatever language the request was in. Product content for users of
+  another language (a Swedish UI locale, game texts, test phrases) is content and stays in that language. A guardrails
+  hook refuses a commit, PR or issue written in Swedish.
 - **Done is decided before the work.** Every ready issue carries a review key, committed first and frozen; a separate
   reviewer checks it.
+- **Whoever fixes is checked by someone fresh.** A reviewer may fix its own findings, since it knows them best, but never
+  approves its own fixes: a new reviewer that did not write them checks each one. The key reviewer never fixes at all.
 - **Show, then read.** A PR arrives with a short video, a flowchart of what changed and the key's verdict; the diff is for
   the few places that need a person.
 - **Method in the skill, facts in the profile.** A skill never names a repository's paths; the profile never explains how

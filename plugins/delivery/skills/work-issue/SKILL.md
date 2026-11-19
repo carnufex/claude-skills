@@ -6,7 +6,8 @@ description: Take a GitHub issue from "ready" to a pull request — pick or read
 # Work an issue
 
 Issues are the working memory: someone reading only the issue and its PR must understand what was done and why.
-Repository facts (labels, how claims and status work, branch and commit format, test commands, language of issue text) are
+Everything you write — code, comments, commits, issue comments, the PR — is in English, whatever language the request
+was in. Repository facts (labels, how claims and status work, branch and commit format, test commands) are
 in `.claude/profiles/delivery.md`. **Read it first.** If it is missing, create it as `new-issue` describes, then come back.
 
 ## 1. Pick
@@ -73,8 +74,8 @@ the docs or a related repository is answered, not asked.
 ## 7. Done or stopped
 
 - Done means the key passes **for someone else**: spawn the `key-reviewer` agent with only the repository path, the
-  branch, the issue number and the base branch (`review-key`, *The loop*). `FAIL`: fix and ask again, at most three
-  rounds, then ask the human. `KEY-WEAK`: the key needs a human decision. `PASS`: hand off to `ship` (verify, PR with
+  branch, the issue number and the base branch (`review-key`, *The loop*). `FAIL`: fix and ask a **new** `key-reviewer` (never continue the last
+  one: it would remember its verdict), at most three rounds, then ask the human. `KEY-WEAK`: the key needs a human decision. `PASS`: hand off to `ship` (verify, PR with
   `Closes #<n>` and the reviewer's verdict, demo, merge, deploy, verify live, close the loop).
 - Stopping before done: unclaim, and comment what is done, what is left and where the branch is. A claim nobody works on
   blocks everyone else.

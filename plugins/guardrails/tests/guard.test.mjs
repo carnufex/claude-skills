@@ -112,6 +112,30 @@ test('heredoc and here-string bodies are data, not commands', () => {
   assert.match(hook("cat <<EOF > note.txt\nhello\nEOF\ngit add -A", d), /explicit paths/, 'a command after the heredoc is still seen');
 });
 
+test('the work is written in English', () => {
+  const d = repo();
+  fs.writeFileSync(path.join(d, '.git', 'FETCH_HEAD'), '');
+  // Swedish messages, titles and bodies are refused
+  assert.match(hook('git commit -m "tap_stream: ett fel säger vad låtsasklienten gör (#132)"', d), /in English/);
+  assert.match(hook('git commit -qm "Fixa så att kartan inte flimrar när man byter våning"', d), /in English/);
+  assert.match(hook("git commit -q -F - <<'EOF'\nRättar felet som gör att listan inte uppdateras.\n\nDet här är en enkel ändring.\nEOF", d), /in English/);
+  assert.match(hook("git commit -m @'\nVi har lagt till en ny vy för alla möten.\n'@", d), /in English/);
+  assert.match(hook('gh issue create --title "Rösten är för långsam när man pratar" --body "x"', d), /in English/);
+  fs.writeFileSync(path.join(d, 'sv.md'), 'Det här är en beskrivning av vad som har ändrats och varför vi gör det.\n\n3 am: loggen\n');
+  assert.match(hook('gh pr create --title t --body-file sv.md', d), /in English/);
+  assert.match(hook('gh pr comment 12 --body "Jag har fixat det nu, kan du titta igen?"', d), /in English/);
+  // English passes, also with Swedish names, quoted product text and code spans
+  assert.equal(hook('git commit -m "Fix the build of Sista natten på Holmnäs"', d), null);
+  assert.equal(hook('git commit -m "Voice: add the phrase \'Hej! Jag är här, vad vill du veta?\' to the corpus"', d), null);
+  assert.equal(hook('git commit -m "Translate the toolbar: `Sök`, `Spara`, `Avbryt`, `Öppna`"', d), null);
+  assert.equal(hook("git commit -q -F - <<'EOF'\nKeep the map steady when the floor changes.\nEOF", d), null);
+  assert.equal(hook('gh issue create --title "Voice answers are slow" --body "Time to first audio is 3.9 s at p50."', d), null);
+  // a heredoc that is not the message is not judged
+  assert.equal(hook("cat <<EOF > sv.txt\nDet här är svensk text för användaren och den ska vara kvar.\nEOF\ngit commit -m \"Add the Swedish help text\"", d), null);
+  // switched off
+  assert.equal(hook('git commit -m "Fixa så att kartan inte flimrar när man byter våning"', d, { GUARDRAILS_LANGUAGE: 'any' }), null);
+});
+
 test('fails open', () => {
   const r = spawnSync(process.execPath, [GUARD], { input: 'not json', encoding: 'utf8' });
   assert.equal(r.status, 0);

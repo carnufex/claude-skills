@@ -149,8 +149,10 @@ End with a short `## Coverage` section: what you read, what you did not, and any
    filing them again.
 3. Create missing labels once: `review-sweep`, `severity:high`, `severity:medium`, `severity:low`, plus whatever the profile's
    label scheme needs.
-4. File one issue per finding: `gh issue create --title ... --label "<labels per the profile>" --body-file ...`. Body: Finding,
+4. File one issue per finding, in English: `gh issue create --title ... --label "<labels per the profile>" --body-file ...`. Body: Finding,
    Where, Evidence, Impact, Fix direction, Acceptance (the reviewer's words, tightened). Exploitable security findings describe
    the impact and the fix, not a ready-made attack, and are reported to the owner at once in the final report.
+   The finder does not fix: each issue is worked like any other (`work-issue` in the delivery plugin), with its Acceptance
+   as the review key and an independent `key-reviewer` before it ships.
 5. Final report: findings per dimension and severity, the issue links, what was dropped and why, the areas and files covered,
    and what was not reviewed. Write a copy into the repository only if the owner asks (the profile may name where).
