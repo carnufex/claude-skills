@@ -7,6 +7,7 @@
 //      `git fetch … && git push` in one command passes. Force pushes to main/master are refused.
 //   3. A committed review key is frozen: a commit that changes `.review-keys/<n>.json` or one of its oracle paths, once
 //      that key is in HEAD, is refused unless the command carries REVIEW_KEY_CHANGE=<n> (a human answered on the issue).
+//      A file in the oracle of several keys needs all of them: REVIEW_KEY_CHANGE=<n>,<m>.
 //   4. A pull request in a repository with a delivery profile carries a `3 am:` line in its body.
 //   5. The work is written in English: a commit message, PR or issue text (title, body, comment) that reads as Swedish is
 //      refused, whatever language the request was in. Text in quotes or code spans is product content and not judged.
@@ -170,8 +171,9 @@ export function check(input) {
 
 function envPrefix(cmd) {
   const env = {};
-  for (const m of cmd.matchAll(/\bREVIEW_KEY_CHANGE=(\d+)/g)) env.REVIEW_KEY_CHANGE = m[1];
-  for (const m of cmd.matchAll(/\$env:REVIEW_KEY_CHANGE\s*=\s*['"]?(\d+)/gi)) env.REVIEW_KEY_CHANGE = m[1];
+  const list = String.raw`(\d+(?:\s*,\s*\d+)*)`;
+  for (const m of cmd.matchAll(new RegExp(String.raw`\bREVIEW_KEY_CHANGE=['"]?` + list, 'g'))) env.REVIEW_KEY_CHANGE = m[1];
+  for (const m of cmd.matchAll(new RegExp(String.raw`\$env:REVIEW_KEY_CHANGE\s*=\s*['"]?` + list, 'gi'))) env.REVIEW_KEY_CHANGE = m[1];
   return env;
 }
 
@@ -196,16 +198,22 @@ function frozenKey(dir, env) {
   if (!changed.length) return null;
   let keys;
   try { keys = git(dir, 'ls-tree', '--name-only', 'HEAD', '.review-keys/').split('\n').filter((f) => /\.review-keys\/\d+\.json$/.test(f)); } catch { return null; }
+  const allowed = new Set(String(env.REVIEW_KEY_CHANGE || '').split(',').map((s) => s.trim()).filter(Boolean));
+  const hits = [];
   for (const keyFile of keys) {
     const n = keyFile.match(/(\d+)\.json$/)[1];
     let oracle = [];
     try { oracle = (JSON.parse(git(dir, 'show', `HEAD:${keyFile}`)).oracle || []).map((p) => p.replace(/\\/g, '/').replace(/\/$/, '')); } catch { /* unreadable key: guard the key file itself */ }
     const hit = changed.filter((p) => p === keyFile || oracle.some((o) => p === o || p.startsWith(`${o}/`)));
-    if (hit.length && env.REVIEW_KEY_CHANGE !== n) {
-      return `the review key for #${n} is frozen (${hit.join(', ')}). The implementer never changes it; a wrong key is a human decision on the issue. After the answer, commit the change alone as "Review key for #${n}: <what changed>" with REVIEW_KEY_CHANGE=${n} in front of the git command.`;
-    }
+    if (hit.length) hits.push({ n, hit });
   }
-  return null;
+  const refused = hits.find(({ n }) => !allowed.has(n));
+  if (!refused) return null;
+  // every key that lists one of the refused files must be named, so the advice names them all
+  const needed = hits.filter(({ hit }) => hit.some((p) => refused.hit.includes(p))).map(({ n }) => n);
+  const nums = needed.map((n) => `#${n}`).join(' and ');
+  const subject = needed.length > 1 ? `review keys for ${nums} are` : `review key for ${nums} is`;
+  return `the ${subject} frozen (${refused.hit.join(', ')}). The implementer never changes it; a wrong key is a human decision on the issue. After the answer, commit the change alone as "Review key for ${nums}: <what changed>" with REVIEW_KEY_CHANGE=${needed.join(',')} in front of the git command.`;
 }
 
 function prBody(words, cwd) {
