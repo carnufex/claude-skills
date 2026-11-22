@@ -241,7 +241,7 @@ commands) and checked before it runs. A refusal names the right way; any error i
 |---|---|---|
 | Stage explicit paths | `git add -A`, `--all`, `.`; `git commit -a` | `git add src/x.ts docs/y.md` |
 | Fetch before you push | `git push` with nothing fetched in 15 minutes; a force push to `main` | `git fetch && git push`; `--force-with-lease` on a branch |
-| A committed review key is frozen | a commit that changes `.review-keys/<n>.json` or its oracle | the key commit; a human-approved change with `REVIEW_KEY_CHANGE=<n>` |
+| A committed review key is frozen | a commit that changes `.review-keys/<n>.json` or its oracle | the key commit; a human-approved change with `REVIEW_KEY_CHANGE=<n>` (`<n>,<m>` for a file several keys list) |
 | A `3 am:` line in every PR | `gh pr create` without one, where a delivery profile exists | `3 am: <signal>`, or `3 am: n/a (<why>)` |
 | The work is in English | a commit message, PR or issue text (title, body, comment) written in Swedish | English prose; Swedish product text in quotes or code spans |
 

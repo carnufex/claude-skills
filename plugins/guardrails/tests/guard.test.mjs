@@ -89,6 +89,36 @@ test('a committed review key is frozen', () => {
   assert.match(hook('git commit -m "x"', d), /frozen.*\.review-keys\/7\.json/);
 });
 
+test('a file in the oracle of several keys needs every one of them', () => {
+  const d = repo();
+  fs.mkdirSync(path.join(d, '.review-keys')); fs.mkdirSync(path.join(d, 'keys'));
+  fs.writeFileSync(path.join(d, '.review-keys', '247.json'), JSON.stringify({ kind: 'spec', oracle: ['keys/Shared.cs'] }));
+  fs.writeFileSync(path.join(d, '.review-keys', '398.json'), JSON.stringify({ kind: 'spec', oracle: ['keys/Shared.cs', 'keys/Own398.cs'] }));
+  fs.writeFileSync(path.join(d, '.review-keys', '500.json'), JSON.stringify({ kind: 'spec', oracle: ['keys/Own500.cs'] }));
+  for (const f of ['Shared.cs', 'Own398.cs', 'Own500.cs']) fs.writeFileSync(path.join(d, 'keys', f), 'key\n');
+  g(d, 'add', '.review-keys', 'keys'); g(d, 'commit', '-qm', 'Review keys');
+  // the shared file: one number is not enough, either way round, and the refusal names both
+  fs.writeFileSync(path.join(d, 'keys', 'Shared.cs'), 'fixed\n'); g(d, 'add', 'keys/Shared.cs');
+  const both = /review keys for #247 and #398 are frozen \(keys\/Shared\.cs\).*REVIEW_KEY_CHANGE=247,398 in front/;
+  assert.match(hook('REVIEW_KEY_CHANGE=247 git commit -m "x"', d), both);
+  assert.match(hook('REVIEW_KEY_CHANGE=398 git commit -m "x"', d), both);
+  assert.match(hook('git commit -m "x"', d), both);
+  // a list of every key that lists it passes, in any order, also in PowerShell and quoted
+  assert.equal(hook('REVIEW_KEY_CHANGE=247,398 git commit -m "Review key for #247 and #398: x"', d), null);
+  assert.equal(hook('REVIEW_KEY_CHANGE=398,247 git commit -m "x"', d), null);
+  assert.equal(hook('REVIEW_KEY_CHANGE="247, 398" git commit -m "x"', d), null);
+  assert.equal(hook('$env:REVIEW_KEY_CHANGE="247,398"; git commit -m "x"', d), null);
+  // a key not in the list is still refused, even when the others are named
+  fs.writeFileSync(path.join(d, 'keys', 'Own500.cs'), 'weaker\n'); g(d, 'add', 'keys/Own500.cs');
+  assert.match(hook('REVIEW_KEY_CHANGE=247,398 git commit -m "x"', d), /review key for #500 is frozen.*keys\/Own500\.cs/);
+  assert.equal(hook('REVIEW_KEY_CHANGE=247,398,500 git commit -m "x"', d), null);
+  g(d, 'reset', '-q');
+  // a list with extra numbers is no wider than its numbers: 398's own file needs 398
+  fs.writeFileSync(path.join(d, 'keys', 'Own398.cs'), 'weaker\n'); g(d, 'add', 'keys/Own398.cs');
+  assert.match(hook('REVIEW_KEY_CHANGE=247,500 git commit -m "x"', d), /review key for #398 is frozen/);
+  assert.equal(hook('REVIEW_KEY_CHANGE=398 git commit -m "x"', d), null);
+});
+
 test('a 3 am line in pull requests where the delivery profile is used', () => {
   const d = repo({ profile: true });
   const plain = repo();
